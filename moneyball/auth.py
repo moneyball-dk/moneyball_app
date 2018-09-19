@@ -33,7 +33,14 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
-
+            
+            user_id = db.execute(
+                'SELECT id FROM user WHERE username = ?', (username,)
+            ).fetchone()['id']
+            db.execute(
+                'INSERT INTO rating (user_id, elo) VALUES (?, ?)', (user_id, 1200)
+            )
+            db.commit()
             # Return user to login page
             return redirect(url_for('auth.login'))
 

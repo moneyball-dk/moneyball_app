@@ -66,6 +66,7 @@ def create():
                 (winner1, winner2, loser1, loser2, winner_score, loser_score)
             )
             db.commit()
+            # TODO: Update elo ratings after a match is played
             return redirect(url_for('match.index'))
     db = get_db()
     users = db.execute(

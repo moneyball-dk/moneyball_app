@@ -43,6 +43,15 @@ def get_stats(userid):
         f'SELECT id FROM match WHERE loser_2_id = {userid}'
     ).fetchall()
 
+    elo = db.execute(
+        'SELECT * FROM rating where user_id = ? ORDER BY update_date', (userid,)
+    ).fetchone()
+    try:
+        elo = elo['elo']
+    except:
+        elo = None
+
+
     wins = len(m_w1) + len(m_w2)
     losses = len(m_l1) + len(m_l2)
-    return wins, losses
+    return wins, losses, elo
