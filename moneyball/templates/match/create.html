@@ -6,14 +6,38 @@
 
 {% block content %}
   <form method="post">
-    <label for='winner1'>winner1</label>
-    <input name='winner1' id='winner1', value="{{ request.form['winner1'] }}" required>
-    <label for='winner2'>winner2</label>
-    <input name='winner2' id='winner2', value="{{ request.form['winner2'] }}">
-    <label for='loser1'>loser1</label>
-    <input name='loser1' id='loser1', value="{{ request.form['loser1'] }}" required>
-    <label for='loser2'>loser2</label>
-    <input name='loser2' id='loser2', value="{{ request.form['loser2'] }}">
+    <label for='winner1'>Winner 1</label>
+    <select name='winner1' id='winner1'>
+      <option disabled selected value> -- select an option -- </option>
+      {% for user in users %}
+        <option value="{{ user['id'] }}">{{ user['username'] }}</option>
+      {% endfor %}
+    </select>
+
+    <label for='winner2'>Winner 2</label>
+    <select name='winner2' id='winner2'>
+      <option disabled selected value> -- select an option -- </option>
+      {% for user in users %}
+        <option value="{{ user['id'] }}">{{ user['username'] }}</option>
+      {% endfor %}
+    </select>
+    
+    <label for='loser1'>Loser 1</label>
+    <select name='loser1' id='loser1'>
+      <option disabled selected value> -- select an option -- </option>
+      {% for user in users %}
+        <option value="{{ user['id'] }}">{{ user['username'] }}</option>
+      {% endfor %}
+    </select>
+
+    <label for='loser2'>Loser 2</label>
+    <select name='loser2' id='loser2'>
+      <option disabled selected value> -- select an option -- </option>
+      {% for user in users %}
+        <option value="{{ user['id'] }}">{{ user['username'] }}</option>
+      {% endfor %}
+    </select>
+
     <input type="submit" value="Save">
   </form>
 {% endblock %}

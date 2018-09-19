@@ -48,4 +48,9 @@ def create():
             )
             db.commit()
             return redirect(url_for('match.index'))
-    return render_template('match/create.html')
+    db = get_db()
+    users = db.execute(
+        'SELECT id, username FROM user ORDER BY username'
+    ).fetchall()
+
+    return render_template('match/create.html', users=users)
