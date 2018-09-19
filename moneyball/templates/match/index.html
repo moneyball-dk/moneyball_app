@@ -16,8 +16,9 @@
           <div class="about">Played on {{ match['played_date'].strftime('%Y-%m-%d') }}</div>
         </div>
       </header>
-      <p class="body">Winner: {{ match['winner_1_name'] }}, {{ match['winner_2_name'] }}</p>
-      <p class="body">Loser: {{ match['loser_1_name'] }}, {{ match['loser_2_name'] }}</p>
+      <p class="body">Winner: <a href="user/{{ match['winner_1_id'] }}">{{ match['winner_1_name'] }}</a>, <a href="user/{{ match['winner_2_id'] }}">{{ match['winner_2_name'] }}</a>
+        </p>
+        <p class="body">Loser: <a href="user/{{ match['loser_1_id'] }}">{{ match['loser_1_name'] }}</a>, <a href="user/{{ match['loser_2_id'] }}">{{ match['loser_2_name'] }}</a>
       <p class="body">Score: {{ match['winner_score'] }} - {{ match['loser_score'] }}</p>
     </article>
     {% if not loop.last %}

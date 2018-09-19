@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}User: {{user['username']}} {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <p>Wins: {{stats[0]}}</p>
+  <p>Winrate: {{stats[0] / (stats[0] + stats[1]) * 100}} %</p>
+{% endblock %}
