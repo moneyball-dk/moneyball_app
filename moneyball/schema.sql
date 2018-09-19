@@ -13,6 +13,8 @@ CREATE TABLE match (
   winner_2_id INTEGER,
   loser_1_id INTEGER NOT NULL,
   loser_2_id INTEGER,
+  winner_score INTEGER NOT NULL,
+  loser_score INTEGER NOT NULL,
   played_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (winner_1_id) REFERENCES user (id)
 );
