@@ -54,8 +54,8 @@ def create():
         elif not loser1:
             error = 'At least one loser required'
 
-        if winner_score <= loser_score:
-            error = 'Winner score should be more than loser score'
+        if int(winner_score) <= int(loser_score):
+            error = f'Winner score: {winner_score} should be more than loser score: {loser_score}'
         if error is not None:
             flash(error)
         else:
