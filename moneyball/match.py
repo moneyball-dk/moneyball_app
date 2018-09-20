@@ -5,6 +5,7 @@ from werkzeug.exceptions import abort
 
 from moneyball.auth import login_required
 from moneyball.db import get_db
+from collections import Counter
 
 bp = Blueprint('match', __name__)
 
@@ -47,12 +48,7 @@ def create():
         loser_score = request.form['loserscore']
         error = None
 
-
-        if not winner1:
-            error = 'At least one winner required'
-        
-        elif not loser1:
-            error = 'At least one loser required'
+        error = validate_players(winner1, winner2, loser1, loser2)
 
         if int(winner_score) <= int(loser_score):
             error = f'Winner score: {winner_score} should be more than loser score: {loser_score}'
@@ -74,3 +70,21 @@ def create():
     ).fetchall()
 
     return render_template('match/create.html', users=users)
+
+
+def validate_players(w1, w2, l1, l2):
+    # At least one winner
+    if not w1:
+        return 'At least one winner is required'
+    # At least one loser
+    elif not l1:
+        return 'At least one loser is required'
+    
+    # No repeated players
+    players = [p for p in [w1, w2, l1, l2] if p is not None]
+    count_players = Counter(players)
+    for player, count in count_players.items():
+        if count > 1:
+            return 'Each player can only appear once.'
+        
+    return None
