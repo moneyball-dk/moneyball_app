@@ -88,3 +88,14 @@ def validate_players(w1, w2, l1, l2):
             return 'Each player can only appear once.'
         
     return None
+
+def update_elo(w1, w2, l1, l2, k=16):
+    """
+    Given pre-match elo ratings for winners and losers, 
+    return the updated ratings
+    """
+    win_elos = [elo for elo in [w1, w2] if elo is not None]
+    lose_elos = [elo for elo in [l1, l2] if elo is not None]
+    win_avg = sum(win_elos) / len(win_elos)
+    lose_avg = sum(lose_elos) / len(lose_elos)
+    exp_win = None  # TODO: Fix me
