@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import link_user %}
+
+{% block app_content %}
+    <h1>Match details</h1>
+    <p>Match id: {{ match.id }}<br>
+    Game played: {{ moment(match.timestamp).calendar() }}
+    </p>
+    {% if match.players %}
+        <h2>Winning players</h2>
+        {% for p in match.winning_players %}
+            {{link_user(p)}}
+        {% endfor %}
+        <h2>Losing players</h2>
+        {% for p in match.losing_players %}
+            {{link_user(p)}}
+        {% endfor %}
+    {% endif %}
+
+    <h2>Score</h2>
+    {{ match.winner_score }} - {{match.loser_score}}
+{% endblock %}

@@ -3,7 +3,7 @@
 A webapp to track results of foosball games in financial institutions. 
 It is a very niche market!
 
-It is mostly a copy of the [Flask tutorial](http://flask.pocoo.org/docs/1.0/tutorial/), with some small changes.
+It is mostly a copy of the [Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world), with some small changes.
 
 ## Prerequisites
 
@@ -21,24 +21,16 @@ Download the source code
 ```
 git clone https://github.com/KPLauritzen/moneyball_app.git
 cd moneyball_app
-pip install -e .
 ```
 
-Set enviroment variables (on OSX/linux)
+Install the required packages
 ```
-export FLASK_APP=moneyball
-export FLASK_ENV=development
-```
-
-Or set enviroment variables (on Windows `cmd`)
-```
-set FLASK_APP=moneyball
-set FLASK_ENV=development
+pip install -r requirements.txt
 ```
 
-Reset the database
+Start the database
 ```
-flask init-db
+flask db upgrade
 ```
 
 Start the webserver

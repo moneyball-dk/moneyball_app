@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import link_match %}
+
+{% block app_content %}
+    <h1>User: {{ user.username }}</h1>
+    UserID: {{ user.id }}
+    <hr>
+    {% if matches %}
+    <h2>Winrate</h2>
+    {{ user.won_matches|length  / (user.won_matches|length + user.lost_matches|length) * 100 }} %
+    <h2>Matches:</h2>
+    <h3>Won:</h3>
+    {% for match in user.won_matches %}
+        {{ link_match(match) }}
+    {% endfor %}
+    <h3>Lost:</h3>
+    {% for match in user.lost_matches %}
+        {{ link_match(match) }}
+    {% endfor %}
+    {% endif %}
+{% endblock %}

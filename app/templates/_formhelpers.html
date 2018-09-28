@@ -1,0 +1,25 @@
+{% macro render_field(field) %}
+  <dt>{{ field.label }}
+  <dd>{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    <ul class=errors>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  </dd>
+{% endmacro %}
+t
+
+{% macro link_user(user) %}
+  <p>
+    <a href="/user/{{ user.username }}">{{user.username}}</a>
+  </p>
+{% endmacro %}
+
+{% macro link_match(match) %}
+  <p>
+    <a href="/match/{{ match.id }}">Match ID: {{match.id}} - Score {{match.winner_score}}-{{match.loser_score}}</a>
+  </p>
+{% endmacro %}

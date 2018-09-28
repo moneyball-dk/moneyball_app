@@ -1,4 +1,0 @@
-include moneyball/schema.sql
-graft moneyball/static
-graft moneyball/templates
-global-exclude *.pyc

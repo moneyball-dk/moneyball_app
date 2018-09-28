@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block app_content %}
+    <h1>Register match results</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+
+        <d1> {{render_field(form.importance)}} </d1>
+        <h2>Winners</h1>
+
+        <d1> {{render_field(form.winner_score, size=2)}} </d1>
+        <d1> {{render_field(form.winners)}} </d1>
+
+        <h2>Losers</h1>
+
+        <d1> {{render_field(form.loser_score, size=2)}} </d1>
+        <d1> {{render_field(form.losers)}} </d1>
+
+
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
