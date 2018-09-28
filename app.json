@@ -1,0 +1,26 @@
+{
+  "name": "moneyball_app",
+  "scripts": {
+  },
+  "env": {
+    "FLASK_APP": {
+      "required": true
+    },
+    "LOG_TO_STDOUT": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}

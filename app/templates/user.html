@@ -3,7 +3,8 @@
 
 {% block app_content %}
     <h1>User: {{ user.username }}</h1>
-    UserID: {{ user.id }}
+    UserID: {{ user.id }} <br>
+    Elo: {{ user.get_elo()|round|int }}
     <hr>
     {% if matches %}
     <h2>Winrate</h2>
@@ -11,7 +12,7 @@
     <h2>Matches:</h2>
     <h3>Won:</h3>
     {% for match in user.won_matches %}
-        {{ link_match(match) }}
+        {{ link_match(match, user) }}
     {% endfor %}
     <h3>Lost:</h3>
     {% for match in user.lost_matches %}

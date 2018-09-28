@@ -18,8 +18,11 @@ t
   </p>
 {% endmacro %}
 
-{% macro link_match(match) %}
+{% macro link_match(match, user=None) %}
   <p>
     <a href="/match/{{ match.id }}">Match ID: {{match.id}} - Score {{match.winner_score}}-{{match.loser_score}}</a>
+    {% if user %}
+    - Elo after match: {{ user.get_match_rating_value(match, 'elo')|round}}
+    {% endif %}
   </p>
 {% endmacro %}

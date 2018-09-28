@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.models import User, Match, UserMatch
+from app.models import User, Match, UserMatch, Rating
 from app.forms import LoginForm, RegistrationForm, CreateMatchForm
 
 @app.route('/')
@@ -46,6 +46,14 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+
+        r_elo = Rating(user=user, rating_type='elo', rating_value=1500)
+        r_ts_m = Rating(user=user, rating_type='trueskill_mu', rating_value=25)
+        r_ts_s = Rating(user=user, rating_type='trueskill_sigma', rating_value=8.333)
+        db.session.add(r_elo)
+        db.session.add(r_ts_m)
+        db.session.add(r_ts_s)
+        db.session.commit()
         flash('Congratulations! You are registered.')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -71,7 +79,8 @@ def create_match():
     if form.validate_on_submit():
         match = Match(
             winner_score=form.winner_score.data, 
-            loser_score=form.loser_score.data)
+            loser_score=form.loser_score.data,
+            importance=form.importance.data)
         db.session.add(match)
         db.session.flush()
 
@@ -87,7 +96,30 @@ def create_match():
                 match=match, 
                 win=False)
             db.session.add(user_match)
+        db.session.flush()
+        
+        elo_change = get_match_elo_change(match)
+        print(elo_change)
+        for p in form.winners.data:
+            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_elo() + elo_change)
+            db.session.add(r)
+        for p in form.losers.data:
+            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_elo() - elo_change)
+            db.session.add(r)
         db.session.commit()
         flash('Match created')
         return redirect(url_for('login'))
     return render_template('create_match.html', title='Create match', form=form)
+
+
+def get_match_elo_change(match):
+    Qs = []
+    for players in [match.winning_players, match.losing_players]:
+        elos = [p.get_elo() for p in players]
+        avg_elo = sum(elos) / len(elos)
+        Q = 10 ** (avg_elo / 400)
+        Qs.append(Q)
+    Q_w, Q_l = Qs
+    exp_win = Q_w / (Q_w + Q_l)
+    change_w = match.importance * (1 - exp_win)
+    return change_w
