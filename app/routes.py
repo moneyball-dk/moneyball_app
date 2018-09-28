@@ -5,6 +5,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
 from app.forms import LoginForm, RegistrationForm, CreateMatchForm
+from app.plots import plot_ratings, components
 
 @app.route('/')
 @app.route('/index')
@@ -61,7 +62,10 @@ def register():
 @app.route('/user/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user, matches=user.matches)
+    plot = plot_ratings(username, 'elo')
+    b_script, b_div = components(plot)
+    return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
+
 
 @app.route('/match/<match_id>')
 def match(match_id):

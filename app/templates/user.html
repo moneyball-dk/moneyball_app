@@ -4,11 +4,8 @@
 {% block app_content %}
     <h1>User: {{ user.username }}</h1>
     UserID: {{ user.id }} <br>
-    Elo: {{ user.get_elo()|round|int }}
     <hr>
     {% if matches %}
-    <h2>Winrate</h2>
-    {{ user.won_matches|length  / (user.won_matches|length + user.lost_matches|length) * 100 }} %
     <h2>Matches:</h2>
     <h3>Won:</h3>
     {% for match in user.won_matches %}
@@ -16,7 +13,14 @@
     {% endfor %}
     <h3>Lost:</h3>
     {% for match in user.lost_matches %}
-        {{ link_match(match) }}
+        {{ link_match(match, user) }}
     {% endfor %}
     {% endif %}
+
+    <h2>Stats</h2>
+    Elo: {{ user.get_elo()|round|int }} <br>
+    Winrate: {{ (user.won_matches|length  / (user.won_matches|length + user.lost_matches|length) * 100)|round }} %
+
+{{ b_div|safe }}
+{{ b_script|safe }}
 {% endblock %}
