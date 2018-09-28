@@ -77,14 +77,14 @@ def create_match():
 
         for w in form.winners.data:
             user_match = UserMatch(
-                user_id=w.id,
-                match_id=match.id, 
+                user=w,
+                match=match, 
                 win=True)
             db.session.add(user_match)
         for l in form.losers.data:
             user_match = UserMatch(
-                user_id=l.id,
-                match_id=match.id, 
+                user=l,
+                match=match, 
                 win=False)
             db.session.add(user_match)
         db.session.commit()

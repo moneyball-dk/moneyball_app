@@ -38,8 +38,8 @@ class UserModelCase(unittest.TestCase):
         u2m2 = UserMatch(user_id=u2.id, match_id=m2.id, win=True)
 
         db.session.add(u1m1)
+        db.session.add(u1m2)
         db.session.add(u2m1)
-        db.session.add(u2m2)
         db.session.add(u2m2)
         db.session.commit()
 
@@ -47,12 +47,14 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(u1.won_matches, [m1])
         self.assertNotEqual(u1.lost_matches, [m1])
         self.assertEqual(u2.lost_matches, [m1])
-        self.assertNotEqual(u2.matches, [m1, m2])
+        self.assertEqual(u2.matches, [m1, m2])
         self.assertEqual(u1.won_matches, u2.lost_matches)
 
         self.assertEqual(m1.players, [u1, u2])
         self.assertEqual(m1.winning_players, [u1])
         self.assertEqual(m1.losing_players, [u2])
+
+        self.assertEqual(u1m1.user.id, u1m1.user_id)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

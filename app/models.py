@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     matches = db.relationship('Match', 
         secondary='user_match', 
+        primaryjoin="user_match.c.user_id == user.c.id",
         lazy='subquery', 
         backref=db.backref('players', lazy=True)
     )
@@ -43,11 +44,12 @@ def load_user(id):
 
 class UserMatch(db.Model):
     __tablename__ = 'user_match'
-    #__table_args__ = ( db.PrimaryKeyConstraint('user_id', 'match_id'), )
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), primary_key=True)
     win = db.Column(db.Boolean)
- 
+
+    user = db.relationship('User', foreign_keys=user_id)
+    match = db.relationship('Match', foreign_keys=match_id)
 
 
 class Match(db.Model):
