@@ -31,7 +31,6 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email')
 
 class CreateMatchForm(FlaskForm):
-    users = User.query.all()
     winner_score = IntegerField('Winning Score', validators=[Optional()])
     loser_score = IntegerField('Losing Score', validators=[Optional()])
     winners = QuerySelectMultipleField(

@@ -1,6 +1,3 @@
-"""
-Main application module
-"""
 from app import app, db
 from app.models import User, Match, UserMatch
 

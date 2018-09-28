@@ -14,8 +14,9 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app=app, db=db)
 login = LoginManager(app=app)
+login.login_view = 'login'
 boostrap = Bootstrap(app=app)
 moment = Moment(app)
 
-from app import models
-from app import routes
+
+from app import routes, models
