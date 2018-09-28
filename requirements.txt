@@ -6,3 +6,5 @@ flask-migrate
 flask-login
 flask-bootstrap
 flask-moment
+gunicorn
+psycopg2
