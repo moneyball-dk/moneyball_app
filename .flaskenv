@@ -1,2 +1,1 @@
 FLASK_APP=moneyball.py
-FLASK_ENV=development

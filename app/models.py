@@ -1,6 +1,6 @@
 from app import db, login
 from datetime import datetime
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -37,6 +37,36 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def get_elo(self):
+        elo = Rating.query \
+            .filter(and_(Rating.user_id == self.id), Rating.rating_type == 'elo') \
+            .order_by(Rating.timestamp.desc()) \
+            .first()
+        return elo.rating_value
+
+    def get_trueskill(self):
+        mu = Rating.query \
+            .filter(and_(Rating.user_id == self.id), Rating.rating_type == 'trueskill_mu') \
+            .order_by(Rating.timestamp.desc()) \
+            .first()
+        sigma = Rating.query \
+            .filter(and_(
+                Rating.user_id == self.id), 
+                Rating.rating_type == 'trueskill_sigma') \
+            .order_by(Rating.timestamp.desc()) \
+            .first()
+        return (mu.rating_value, sigma.rating_value)
+    
+    def get_match_rating_value(self, match, rating_type='elo'):
+        rating = Rating.query \
+            .filter(Rating.user_id == self.id) \
+            .filter(Rating.match_id == match.id) \
+            .filter(Rating.rating_type == 'elo') \
+            .first()
+        try:
+            return rating.rating_value
+        except AttributeError:
+            return 0
 
 @login.user_loader
 def load_user(id):
@@ -68,11 +98,14 @@ class Rating(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
-    elo = db.Column(db.Integer)
-    trueskill = db.Column(db.Integer)
+    rating_type = db.Column(db.String(64), index=True)
+    rating_value = db.Column(db.Float)
+
+    user = db.relationship('User', foreign_keys=user_id)
+    match = db.relationship('Match', foreign_keys=match_id)
 
     def __repr__(self):
-        return f'<Rating for user{self.user_id}>'
+        return f'<Rating - user:{self.user_id}, {self.rating_type}:{self.rating_value} @ {self.timestamp}>'
 
 
 class Table(db.Model):

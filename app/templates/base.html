@@ -50,7 +50,16 @@
     </div>
 {% endblock %}
 
+
+{% block styles%}
+    {{ super()}}
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css" rel="stylesheet" type="text/css">
+{% endblock %}
 {% block scripts %}
     {{ super() }}
     {{ moment.include_moment() }}
+
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
 {% endblock %}

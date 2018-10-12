@@ -8,3 +8,5 @@ flask-bootstrap
 flask-moment
 gunicorn
 psycopg2
+bokeh
+numpy
