@@ -19,7 +19,13 @@
 
     <h2>Stats</h2>
     Elo: {{ user.get_current_elo()|round|int }} <br>
-    Winrate: {{ (user.won_matches|length  / (user.won_matches|length + user.lost_matches|length) * 100)|round }} %
+    {% set denom = (user.won_matches|length + user.lost_matches|length) %}
+    {% if denom == 0 %}
+        {% set winrate = "Undefined " %}
+    {% else %}
+        {% set winrate = (user.won_matches|length / denom * 100)|round %}
+    {% endif %}
+    Winrate: {{ winrate }} %
 
 {{ b_div|safe }}
 {{ b_script|safe }}
