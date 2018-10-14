@@ -18,7 +18,7 @@
     {% endif %}
 
     <h2>Stats</h2>
-    Elo: {{ user.get_elo()|round|int }} <br>
+    Elo: {{ user.get_current_elo()|round|int }} <br>
     Winrate: {{ (user.won_matches|length  / (user.won_matches|length + user.lost_matches|length) * 100)|round }} %
 
 {{ b_div|safe }}
