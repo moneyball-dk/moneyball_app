@@ -37,12 +37,15 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def get_elo(self):
-        elo = Rating.query \
+    def get_current_elo(self):
+        elo_q = Rating.query \
             .filter(and_(Rating.user_id == self.id), Rating.rating_type == 'elo') \
             .order_by(Rating.timestamp.desc()) \
             .first()
-        return elo.rating_value
+        try:
+            return elo_q.rating_value
+        except AttributeError:
+            return 1500
 
     def get_trueskill(self):
         mu = Rating.query \
@@ -55,7 +58,10 @@ class User(UserMixin, db.Model):
                 Rating.rating_type == 'trueskill_sigma') \
             .order_by(Rating.timestamp.desc()) \
             .first()
-        return (mu.rating_value, sigma.rating_value)
+        try:
+            return (mu.rating_value, sigma.rating_value)
+        except AttributeError:
+            return (25, 8.33)
     
     def get_match_rating_value(self, match, rating_type='elo'):
         rating = Rating.query \

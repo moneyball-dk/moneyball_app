@@ -105,10 +105,10 @@ def create_match():
         elo_change = get_match_elo_change(match)
         print(elo_change)
         for p in form.winners.data:
-            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_elo() + elo_change)
+            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() + elo_change)
             db.session.add(r)
         for p in form.losers.data:
-            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_elo() - elo_change)
+            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() - elo_change)
             db.session.add(r)
         db.session.commit()
         flash('Match created')
@@ -119,7 +119,7 @@ def create_match():
 def get_match_elo_change(match):
     Qs = []
     for players in [match.winning_players, match.losing_players]:
-        elos = [p.get_elo() for p in players]
+        elos = [p.get_current_elo() for p in players]
         avg_elo = sum(elos) / len(elos)
         Q = 10 ** (avg_elo / 400)
         Qs.append(Q)
