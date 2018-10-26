@@ -29,10 +29,14 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   {% else %}
-    Highest ranking players
-
+    Highest ranking players:
+    <ol>
     {% for  u in users %}
-    <p> {{loop.index}}. {{link_user_elo(u)}} </p>
+      <li>
+        {{link_user_elo(u)}}
+      </li>
     {% endfor %}
+    </ol>
   {% endif %}
+
 {% endblock %}
