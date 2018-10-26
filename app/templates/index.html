@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import link_user_elo %}
 
 {% block app_content %} 
   {% if current_user.is_anonymous %}
@@ -28,7 +29,10 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   {% else %}
-    Highest ranking players - TODO
+    Highest ranking players
 
+    {% for  u in users %}
+    <p> {{loop.index}}. {{link_user_elo(u)}} </p>
+    {% endfor %}
   {% endif %}
 {% endblock %}

@@ -26,3 +26,9 @@ t
     {% endif %}
   </p>
 {% endmacro %}
+
+
+{% macro link_user_elo(user) %}
+    <a href="/user/{{ user.username }}">{{user.username}}</a> - 
+      Current Elo: {{user.get_current_elo()|round}}
+{% endmacro %}
