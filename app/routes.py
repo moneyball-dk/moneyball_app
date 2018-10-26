@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
@@ -49,14 +50,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-
-        r_elo = Rating(user=user, rating_type='elo', rating_value=1500)
-        r_ts_m = Rating(user=user, rating_type='trueskill_mu', rating_value=25)
-        r_ts_s = Rating(user=user, rating_type='trueskill_sigma', rating_value=8.333)
-        db.session.add(r_elo)
-        db.session.add(r_ts_m)
-        db.session.add(r_ts_s)
-        db.session.commit()
+        init_ratings(user)
         flash('Congratulations! You are registered.')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -104,14 +98,7 @@ def create_match():
             db.session.add(user_match)
         db.session.flush()
         
-        elo_change = get_match_elo_change(match)
-        print(elo_change)
-        for p in form.winners.data:
-            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() + elo_change)
-            db.session.add(r)
-        for p in form.losers.data:
-            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() - elo_change)
-            db.session.add(r)
+        update_match_ratings(match)
         db.session.commit()
         flash('Match created')
         return redirect(url_for('login'))
@@ -129,3 +116,67 @@ def get_match_elo_change(match):
     exp_win = Q_w / (Q_w + Q_l)
     change_w = match.importance * (1 - exp_win)
     return change_w
+
+@app.route('/recalculate_ratings')
+@login_required
+def recalculate_ratings():
+    users = User.query.all()
+    timestamps = []
+    for u in users:
+        timestamps.append(Rating.query \
+            .filter(Rating.user_id == u.id) \
+            .filter(Rating.rating_type == 'elo') \
+            .order_by(Rating.timestamp) \
+            .first().timestamp )
+    db.session.query(Rating).delete()
+    db.session.commit()
+    for u, t in zip(users, timestamps):
+        init_ratings(u, t)
+
+    matches = Match.query.order_by(Match.timestamp).all()
+    for match in matches:
+        update_match_ratings(match)
+
+    flash('Recalculated ratings!')
+    return index()
+
+def init_ratings(user, timestamp=None):
+    if timestamp is None:
+        timestamp = datetime.now()
+    r_elo = Rating(user=user, rating_type='elo', rating_value=1500, 
+        timestamp=timestamp)
+    r_ts_m = Rating(user=user, rating_type='trueskill_mu', 
+        rating_value=25, timestamp=timestamp)
+    r_ts_s = Rating(user=user, rating_type='trueskill_sigma', 
+        rating_value=8.333, timestamp=timestamp)
+    db.session.add_all([r_elo, r_ts_m, r_ts_s])
+    db.session.commit()
+
+def update_match_ratings(match):
+    elo_change = get_match_elo_change(match)
+    for p in match.winning_players:
+        r = Rating(user=p, match=match, rating_type='elo', 
+        rating_value=p.get_current_elo() + elo_change,
+        timestamp=match.timestamp)
+        db.session.add(r)
+    for p in match.losing_players:
+        r = Rating(user=p, match=match, rating_type='elo',
+        rating_value=p.get_current_elo() - elo_change,
+        timestamp=match.timestamp)
+        db.session.add(r)
+    db.session.commit()
+
+
+@login_required
+@app.route('/match/<match_id>/delete')
+def delete_match(match_id):
+    match = Match.query.filter_by(id=match_id).first_or_404()
+    # First find UserMatch'es that have this match
+    user_matches = UserMatch.query.filter(UserMatch.match_id == match.id).all()
+    for um in user_matches:
+        db.session.delete(um)
+    db.session.delete(match)
+    db.session.commit()
+    flash('Match deleted')
+    recalculate_ratings()
+    return index()
