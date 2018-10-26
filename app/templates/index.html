@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block app_content %}
+{% block app_content %} 
+  {% if current_user.is_anonymous %}
+
     <div class="jumbotron">
     <h1>Moneyball</h1>
     <p>
@@ -17,13 +19,16 @@
     <p>
     Maximize the value of your time by directly measuring TrueSkill&trade;. 
     </p>
+    <form>
+      <div class="form-group">
+        <label for="exampleInputEmail1">Enter your email to be notified when we go live</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  {% else %}
+    Highest ranking players - TODO
 
-<form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Enter your email to be notified when we go live</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+  {% endif %}
 {% endblock %}

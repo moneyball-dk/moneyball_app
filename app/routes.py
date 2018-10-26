@@ -10,7 +10,11 @@ from app.plots import plot_ratings, components
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html', title='Home')
+    #users = User.query.all()
+    #ratings = [u.get_elo() for u in users]
+    #print(ratings)
+    users=None
+    return render_template('index.html', title='Home', users=users)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
