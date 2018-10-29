@@ -19,4 +19,7 @@
 
     <h2>Score</h2>
     {{ match.winner_score }} - {{match.loser_score}}
+
+    <h2>Delete match?</h2>
+    <a href="{{url_for('route_delete_match', match_id=match.id)}}">Click here</a>
 {% endblock %}
