@@ -70,37 +70,18 @@ def match(match_id):
 
 
 @app.route('/create_match', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def create_match():
     if not current_user.is_authenticated:
         flash('You have to login before creating a match.')
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
-        match = Match(
-            winner_score=form.winner_score.data, 
-            loser_score=form.loser_score.data,
-            importance=form.importance.data)
-        db.session.add(match)
-        db.session.flush()
-
-        for w in form.winners.data:
-            user_match = UserMatch(
-                user=w,
-                match=match, 
-                win=True)
-            db.session.add(user_match)
-        for l in form.losers.data:
-            user_match = UserMatch(
-                user=l,
-                match=match, 
-                win=False)
-            db.session.add(user_match)
-        db.session.flush()
-        
-        update_match_ratings(match)
-        db.session.commit()
-        flash('Match created')
+        match = make_new_match()
+        if isinstance(match, Match):
+            flash('Match created')
+        else:
+            flash('Something went wrong')
         return redirect(url_for('login'))
     return render_template('create_match.html', title='Create match', form=form)
 
@@ -118,7 +99,13 @@ def get_match_elo_change(match):
     return change_w
 
 @app.route('/recalculate_ratings')
-@login_required
+#@login_required
+def route_recalculate_ratings():
+    recalculate_ratings()
+    flash('Recalculated ratings!')
+    return index()
+
+
 def recalculate_ratings():
     users = User.query.all()
     timestamps = []
@@ -136,9 +123,6 @@ def recalculate_ratings():
     matches = Match.query.order_by(Match.timestamp).all()
     for match in matches:
         update_match_ratings(match)
-
-    flash('Recalculated ratings!')
-    return index()
 
 def init_ratings(user, timestamp=None):
     if timestamp is None:
@@ -169,14 +153,40 @@ def update_match_ratings(match):
 
 @login_required
 @app.route('/match/<match_id>/delete')
-def delete_match(match_id):
+def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
-    # First find UserMatch'es that have this match
-    user_matches = UserMatch.query.filter(UserMatch.match_id == match.id).all()
-    for um in user_matches:
-        db.session.delete(um)
+    delete_match(match)
+    flash('Match deleted')
+    return index()
+
+def delete_match(match):
     db.session.delete(match)
     db.session.commit()
-    flash('Match deleted')
     recalculate_ratings()
-    return index()
+
+
+def make_new_match(winners, losers, w_score, l_score, importance):
+    match = Match(
+        winner_score=w_score, 
+        loser_score=l_score,
+        importance=importance)
+    db.session.add(match)
+    db.session.flush()
+
+    for w in winners:
+        user_match = UserMatch(
+            user=w,
+            match=match, 
+            win=True)
+        db.session.add(user_match)
+    for l in losers:
+        user_match = UserMatch(
+            user=l,
+            match=match, 
+            win=False)
+        db.session.add(user_match)
+    db.session.flush()
+    
+    update_match_ratings(match)
+    db.session.commit()
+    return match
