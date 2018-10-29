@@ -95,6 +95,7 @@ class Match(db.Model):
     importance = db.Column(db.Integer, default=16)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
+    ratings = db.relationship('Rating')
 
     def __repr__(self):
         return f'<Match - match_id:{self.id}>'
