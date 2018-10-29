@@ -10,3 +10,4 @@ gunicorn
 psycopg2
 bokeh
 numpy
+pytest

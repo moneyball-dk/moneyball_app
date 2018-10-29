@@ -11,8 +11,11 @@ from app.plots import plot_ratings, components
 @app.route('/')
 @app.route('/index')
 def index():
-    users = User.query.all()
-    users = sorted(users, key=lambda u: u.get_current_elo(), reverse=True)
+    try:
+        users = User.query.all()
+        users = sorted(users, key=lambda u: u.get_current_elo(), reverse=True)
+    except:
+        users = None
     return render_template('index.html', title='Home', users=users)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -70,7 +73,7 @@ def match(match_id):
 
 
 @app.route('/create_match', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def create_match():
     if not current_user.is_authenticated:
         flash('You have to login before creating a match.')
@@ -99,7 +102,7 @@ def get_match_elo_change(match):
     return change_w
 
 @app.route('/recalculate_ratings')
-#@login_required
+@login_required
 def route_recalculate_ratings():
     recalculate_ratings()
     flash('Recalculated ratings!')
