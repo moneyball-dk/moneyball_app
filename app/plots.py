@@ -16,7 +16,6 @@ def get_ratings(username, rating_type='elo'):
         .order_by(Rating.timestamp)
     values = [r.rating_value for r in ratings.all()]
     dates = datetime([r.timestamp for r in ratings.all()])
-    print(dates)
     return dates, values
 
 def plot_ratings(username, rating_type):

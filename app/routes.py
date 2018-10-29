@@ -105,7 +105,6 @@ def create_match():
         db.session.flush()
         
         elo_change = get_match_elo_change(match)
-        print(elo_change)
         for p in form.winners.data:
             r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() + elo_change)
             db.session.add(r)
