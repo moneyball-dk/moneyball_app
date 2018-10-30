@@ -112,7 +112,7 @@ def get_match_elo_change(match):
 def route_recalculate_ratings():
     recalculate_ratings()
     flash('Recalculated ratings!')
-    return index()
+    return redirect(url_for('index'))
 
 
 def recalculate_ratings():
@@ -166,7 +166,7 @@ def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     delete_match(match)
     flash('Match deleted')
-    return index()
+    return redirect(url_for('index'))
 
 def delete_match(match):
     db.session.delete(match)
