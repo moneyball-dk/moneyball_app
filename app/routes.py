@@ -166,7 +166,6 @@ def update_match_ratings(match):
 def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     delete_match(match)
-    time.sleep(2)
     flash('Match deleted')
     return redirect(url_for('index'))
 
