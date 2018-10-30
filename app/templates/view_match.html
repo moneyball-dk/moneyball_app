@@ -21,5 +21,7 @@
     {{ match.winner_score }} - {{match.loser_score}}
 
     <h2>Delete match?</h2>
-    <a href="{{url_for('route_delete_match', match_id=match.id)}}">Click here</a>
+    <form action="{{url_for('route_delete_match', match_id=match.id)}}" method='post'>
+        <button type="submit" class="btn-link">Click here to delete</button>
+    </form>
 {% endblock %}
