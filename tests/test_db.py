@@ -78,6 +78,11 @@ def test_matches(filled_db):
 
     matches = Match.query.all()
     assert len(matches) == 3
+    m1, m2, m3 = matches
+
+    assert m1.players == m2.players
+    assert m2.winning_players != m2.losing_players
+
 
 def test_delete_match(filled_db):
     from app.models import Match, User
@@ -96,4 +101,8 @@ def test_delete_match(filled_db):
 
     matches = Match.query.all()
     assert len(matches) == 1
+
+    delete_match(matches[0])
+    assert u1.get_current_elo() == u2.get_current_elo()
+    assert Match.query.all() == []
     
