@@ -161,7 +161,7 @@ def update_match_ratings(match):
 
 
 @login_required
-@app.route('/match/<match_id>/delete')
+@app.route('/delete_match/<match_id>')
 def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     delete_match(match)
