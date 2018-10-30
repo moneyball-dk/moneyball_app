@@ -80,7 +80,13 @@ def create_match():
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
-        match = make_new_match()
+        match = make_new_match(
+            winners=form.winners.data,
+            losers=form.losers.data,
+            w_score=form.winner_score.data,
+            l_score=form.loser_score.data,
+            importance=form.importance.data
+            )
         if isinstance(match, Match):
             flash('Match created')
         else:
