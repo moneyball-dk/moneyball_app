@@ -7,6 +7,7 @@ from app import app, db
 from app.models import User, Match, UserMatch, Rating
 from app.forms import LoginForm, RegistrationForm, CreateMatchForm
 from app.plots import plot_ratings, components
+import time
 
 @app.route('/')
 @app.route('/index')
@@ -112,7 +113,7 @@ def get_match_elo_change(match):
 def route_recalculate_ratings():
     recalculate_ratings()
     flash('Recalculated ratings!')
-    return index()
+    return redirect(url_for('index'))
 
 
 def recalculate_ratings():
@@ -161,12 +162,12 @@ def update_match_ratings(match):
 
 
 @login_required
-@app.route('/match/<match_id>/delete')
+@app.route('/delete_match/<match_id>', methods=['POST'])
 def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     delete_match(match)
     flash('Match deleted')
-    return index()
+    return redirect(url_for('index'))
 
 def delete_match(match):
     db.session.delete(match)
