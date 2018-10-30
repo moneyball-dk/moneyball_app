@@ -7,6 +7,7 @@ from app import app, db
 from app.models import User, Match, UserMatch, Rating
 from app.forms import LoginForm, RegistrationForm, CreateMatchForm
 from app.plots import plot_ratings, components
+import time
 
 @app.route('/')
 @app.route('/index')
@@ -165,6 +166,7 @@ def update_match_ratings(match):
 def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     delete_match(match)
+    time.sleep(2)
     flash('Match deleted')
     return redirect(url_for('index'))
 
