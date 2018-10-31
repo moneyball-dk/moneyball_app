@@ -10,7 +10,7 @@ def test_password_hashing():
 
 def test_create_match(empty_db):
     from app.models import User
-    from app.routes import make_new_match
+    from app.tasks import make_new_match
 
     u1 = User(username='kasper')
     u2 = User(username='felipe')
@@ -53,7 +53,7 @@ def test_matches(filled_db):
 
 def test_delete_match(filled_db):
     from app.models import Match, User
-    from app.routes import delete_match
+    from app.tasks import delete_match
 
     matches = Match.query.all()
     assert len(matches) == 3
@@ -73,3 +73,14 @@ def test_delete_match(filled_db):
     assert u1.get_current_elo() == u2.get_current_elo()
     assert Match.query.all() == []
     
+def test_create_user(filled_db):
+    from app.tasks import create_user
+
+    u = create_user(
+        'new_user',
+        'lol@example.com',
+        'hunter2'
+    )
+
+    assert u.username == 'new_user'
+    assert u.password_hash != 'hunter2'
