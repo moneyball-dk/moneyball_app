@@ -1,3 +1,5 @@
+master: [![Build Status: master](https://travis-ci.org/KPLauritzen/moneyball_app.svg?branch=master)](https://travis-ci.org/KPLauritzen/moneyball_app)
+develop: [![Build Status: develop](https://travis-ci.org/KPLauritzen/moneyball_app.svg?branch=develop)](https://travis-ci.org/KPLauritzen/moneyball_app)
 # Moneyball website
 
 A webapp to track results of foosball games in financial institutions. 
