@@ -21,8 +21,9 @@ def upgrade():
     op.add_column('rating', sa.Column('rating_type', sa.String(length=64), nullable=True))
     op.add_column('rating', sa.Column('rating_value', sa.Float(), nullable=True))
     op.create_index(op.f('ix_rating_rating_type'), 'rating', ['rating_type'], unique=False)
-    op.drop_column('rating', 'trueskill')
-    op.drop_column('rating', 'elo')
+    with op.batch_alter_table('rating') as batch_op:
+        batch_op.drop_column( 'trueskill')
+        batch_op.drop_column( 'elo')
     # ### end Alembic commands ###
 
 

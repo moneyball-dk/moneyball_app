@@ -27,6 +27,7 @@
                     {% else %}
                     <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
                     <li><a href="{{ url_for('create_match') }}">Register a new match result</a></li>
+                    <li><a href="{{ url_for('route_recalculate_ratings') }}">Recalculate Ratings</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>

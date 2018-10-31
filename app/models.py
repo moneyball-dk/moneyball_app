@@ -13,19 +13,20 @@ class User(UserMixin, db.Model):
     matches = db.relationship('Match', 
         secondary='user_match', 
         primaryjoin="user_match.c.user_id == user.c.id",
-        lazy='subquery', 
         backref=db.backref('players', lazy=True)
     )
 
     won_matches = db.relationship('Match',
         secondary='user_match',
         primaryjoin="and_(user_match.c.user_id == user.c.id, user_match.c.win == True)",
-        backref=db.backref('winning_players')
+        backref=db.backref('winning_players'),
+        viewonly=True,
     )
     lost_matches = db.relationship('Match',
         secondary='user_match',
         primaryjoin="and_(user_match.c.user_id == user.c.id, user_match.c.win == False)",
-        backref=db.backref('losing_players')
+        backref=db.backref('losing_players'),
+        viewonly=True,
     )
 
     def __repr__(self):
@@ -85,8 +86,7 @@ class UserMatch(db.Model):
     win = db.Column(db.Boolean)
 
     user = db.relationship('User', foreign_keys=user_id)
-    match = db.relationship('Match', foreign_keys=match_id)
-
+    match = db.relationship('Match', foreign_keys=match_id )
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -95,6 +95,7 @@ class Match(db.Model):
     importance = db.Column(db.Integer, default=16)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
+    ratings = db.relationship('Rating')
 
     def __repr__(self):
         return f'<Match - match_id:{self.id}>'

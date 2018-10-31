@@ -1,17 +1,22 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
 from app.forms import LoginForm, RegistrationForm, CreateMatchForm
 from app.plots import plot_ratings, components
+import time
 
 @app.route('/')
 @app.route('/index')
 def index():
-    users = User.query.all()
-    users = sorted(users, key=lambda u: u.get_current_elo(), reverse=True)
+    try:
+        users = User.query.all()
+        users = sorted(users, key=lambda u: u.get_current_elo(), reverse=True)
+    except:
+        users = None
     return render_template('index.html', title='Home', users=users)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -49,14 +54,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-
-        r_elo = Rating(user=user, rating_type='elo', rating_value=1500)
-        r_ts_m = Rating(user=user, rating_type='trueskill_mu', rating_value=25)
-        r_ts_s = Rating(user=user, rating_type='trueskill_sigma', rating_value=8.333)
-        db.session.add(r_elo)
-        db.session.add(r_ts_m)
-        db.session.add(r_ts_s)
-        db.session.commit()
+        init_ratings(user)
         flash('Congratulations! You are registered.')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -83,37 +81,17 @@ def create_match():
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
-        match = Match(
-            winner_score=form.winner_score.data, 
-            loser_score=form.loser_score.data,
-            importance=form.importance.data)
-        db.session.add(match)
-        db.session.flush()
-
-        for w in form.winners.data:
-            user_match = UserMatch(
-                user=w,
-                match=match, 
-                win=True)
-            db.session.add(user_match)
-        for l in form.losers.data:
-            user_match = UserMatch(
-                user=l,
-                match=match, 
-                win=False)
-            db.session.add(user_match)
-        db.session.flush()
-        
-        elo_change = get_match_elo_change(match)
-        print(elo_change)
-        for p in form.winners.data:
-            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() + elo_change)
-            db.session.add(r)
-        for p in form.losers.data:
-            r = Rating(user=p, match=match, rating_type='elo', rating_value=p.get_current_elo() - elo_change)
-            db.session.add(r)
-        db.session.commit()
-        flash('Match created')
+        match = make_new_match(
+            winners=form.winners.data,
+            losers=form.losers.data,
+            w_score=form.winner_score.data,
+            l_score=form.loser_score.data,
+            importance=form.importance.data
+            )
+        if isinstance(match, Match):
+            flash('Match created')
+        else:
+            flash('Something went wrong')
         return redirect(url_for('login'))
     return render_template('create_match.html', title='Create match', form=form)
 
@@ -129,3 +107,96 @@ def get_match_elo_change(match):
     exp_win = Q_w / (Q_w + Q_l)
     change_w = match.importance * (1 - exp_win)
     return change_w
+
+@app.route('/recalculate_ratings')
+@login_required
+def route_recalculate_ratings():
+    recalculate_ratings()
+    flash('Recalculated ratings!')
+    return redirect(url_for('index'))
+
+
+def recalculate_ratings():
+    users = User.query.all()
+    timestamps = []
+    for u in users:
+        timestamps.append(Rating.query \
+            .filter(Rating.user_id == u.id) \
+            .filter(Rating.rating_type == 'elo') \
+            .order_by(Rating.timestamp) \
+            .first().timestamp )
+    db.session.query(Rating).delete()
+    db.session.commit()
+    for u, t in zip(users, timestamps):
+        init_ratings(u, t)
+
+    matches = Match.query.order_by(Match.timestamp).all()
+    for match in matches:
+        update_match_ratings(match)
+
+def init_ratings(user, timestamp=None):
+    if timestamp is None:
+        timestamp = datetime.now()
+    r_elo = Rating(user=user, rating_type='elo', rating_value=1500, 
+        timestamp=timestamp)
+    r_ts_m = Rating(user=user, rating_type='trueskill_mu', 
+        rating_value=25, timestamp=timestamp)
+    r_ts_s = Rating(user=user, rating_type='trueskill_sigma', 
+        rating_value=8.333, timestamp=timestamp)
+    db.session.add_all([r_elo, r_ts_m, r_ts_s])
+    db.session.commit()
+
+def update_match_ratings(match):
+    elo_change = get_match_elo_change(match)
+    for p in match.winning_players:
+        r = Rating(user=p, match=match, rating_type='elo', 
+        rating_value=p.get_current_elo() + elo_change,
+        timestamp=match.timestamp)
+        db.session.add(r)
+    for p in match.losing_players:
+        r = Rating(user=p, match=match, rating_type='elo',
+        rating_value=p.get_current_elo() - elo_change,
+        timestamp=match.timestamp)
+        db.session.add(r)
+    db.session.commit()
+
+
+@login_required
+@app.route('/delete_match/<match_id>', methods=['POST'])
+def route_delete_match(match_id):
+    match = Match.query.filter_by(id=match_id).first_or_404()
+    delete_match(match)
+    flash('Match deleted')
+    return redirect(url_for('index'))
+
+def delete_match(match):
+    db.session.delete(match)
+    db.session.commit()
+    recalculate_ratings()
+
+
+def make_new_match(winners, losers, w_score, l_score, importance):
+    match = Match(
+        winner_score=w_score, 
+        loser_score=l_score,
+        importance=importance)
+    db.session.add(match)
+    db.session.flush()
+
+    for w in winners:
+        user_match = UserMatch(
+            user=w,
+            match=match, 
+            win=True)
+        db.session.add(user_match)
+    for l in losers:
+        user_match = UserMatch(
+            user=l,
+            match=match, 
+            win=False)
+        db.session.add(user_match)
+    db.session.flush()
+    
+    update_match_ratings(match)
+    db.session.commit()
+    return match
