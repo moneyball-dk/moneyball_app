@@ -2,10 +2,10 @@ from app import db
 from app.models import User, Rating, Match, UserMatch
 from datetime import datetime
 
-def create_user(username, email, password):
+def create_user(shortname, nickname, password):
     user = User(
-        username=username,
-        email=email
+        shortname=shortname,
+        nickname=nickname
     )
     user.set_password(password)
     db.session.add(user)

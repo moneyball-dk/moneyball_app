@@ -3,7 +3,7 @@ import pytest
 
 def test_password_hashing():
     from app.models import User
-    u = User(username='kasper')
+    u = User(shortname='kasper')
     u.set_password('correct-horse')
     assert not u.check_password('zebra')
     assert u.check_password('correct-horse')
@@ -12,8 +12,8 @@ def test_create_match(empty_db):
     from app.models import User
     from app.tasks import make_new_match
 
-    u1 = User(username='kasper')
-    u2 = User(username='felipe')
+    u1 = User(shortname='kasper')
+    u2 = User(shortname='felipe')
     
     m1 = make_new_match(winners=[u1], losers=[u2], w_score=10, 
         l_score=9, importance=32) # Kasper wins
@@ -33,8 +33,8 @@ def test_users(filled_db):
     
     assert len(users) == 2
     u1, u2 = users
-    assert u1.username == 'kasper'
-    assert u2.username == 'felipe'
+    assert u1.shortname == 'kasper'
+    assert u2.shortname == 'felipe'
 
     assert len(u1.matches) == 3
     assert len(u1.won_matches) == 2
@@ -77,10 +77,10 @@ def test_create_user(filled_db):
     from app.tasks import create_user
 
     u = create_user(
-        'new_user',
-        'lol@example.com',
+        'NU',
+        'New User',
         'hunter2'
     )
 
-    assert u.username == 'new_user'
+    assert u.shortname == 'NU'
     assert u.password_hash != 'hunter2'
