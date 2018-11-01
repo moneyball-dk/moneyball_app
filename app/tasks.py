@@ -100,3 +100,10 @@ def make_new_match(winners, losers, w_score, l_score, importance):
     update_match_ratings(match)
     db.session.commit()
     return match
+
+
+def update_user(user, shortname, nickname):
+    user.shortname = shortname
+    user.nickname = nickname
+    db.session.commit()
+    return user

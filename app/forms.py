@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectMultipleField, IntegerField, SelectField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Optional
+from wtforms.validators import DataRequired, ValidationError, EqualTo, Optional
 
 from app.models import User
 
@@ -25,7 +25,7 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different shortname')
 
-    def validate_nickname(self, email):
+    def validate_nickname(self, nickname):
         user = User.query.filter_by(nickname=nickname.data).first()
         if user is not None:
             raise ValidationError('Please use a different nickname')
@@ -61,3 +61,9 @@ class CreateMatchForm(FlaskForm):
     def validate_loser_score(self, loser_score):
         if self.winner_score.data <= loser_score.data:
             raise ValidationError('Winning score must be greater than losing score')
+
+
+class EditUserForm(FlaskForm):
+    shortname = StringField('Shortname', validators=[DataRequired()])
+    nickname = StringField('Nickname', validators=[DataRequired()])
+    submit = SubmitField('Submit')

@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm
 from app.plots import plot_ratings, components
 import time
 
@@ -54,7 +54,7 @@ def register():
     if form.validate_on_submit():
         user = tasks.create_user(
             shortname=form.shortname.data,
-            email=form.email.data,
+            nickname=form.nickname.data,
             password=form.password.data
         )
         if isinstance(user, User):
@@ -118,3 +118,30 @@ def route_delete_match(match_id):
     tasks.delete_match(match)
     flash('Match deleted')
     return redirect(url_for('index'))
+
+@app.route('/edit_user/<user_id>', methods=['GET', 'POST'])
+def route_edit_user(user_id):
+    form = EditUserForm()
+    user = User.query.filter_by(id=user_id).first_or_404()
+    if form.validate_on_submit():
+        print('POST')
+        sn_user = User.query.filter_by(shortname=form.shortname.data).first()
+        if sn_user is not None and sn_user.id != user.id:
+            flash('That shortname is already taken')
+            return redirect(url_for('route_edit_user', user_id=user.id))
+        nn_user = User.query.filter_by(nickname=form.nickname.data).first()
+        if nn_user is not None and nn_user != user:
+            flash('That nickname is already taken')
+            return redirect(url_for('route_edit_user', user_id=user.id))
+        tasks.update_user(
+            user=user,
+            shortname=form.shortname.data,
+            nickname=form.nickname.data,
+        )
+        flash(f'User {user} updated')
+        return redirect(url_for('user', shortname=user.shortname))
+    elif request.method == 'GET':
+        print('GET')
+        form.shortname.data = user.shortname
+        form.nickname.data = user.nickname
+    return render_template('edit_user.html', title='Edit User', form=form)
