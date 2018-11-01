@@ -28,7 +28,7 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(shortname=form.shortname.data).first()
+        user = User.query.filter_by(shortname=form.shortname.data.upper()).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid shortname or password.')
             return redirect(url_for('login'))
@@ -53,7 +53,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = tasks.create_user(
-            shortname=form.shortname.data,
+            shortname=form.shortname.data.upper(),
             nickname=form.nickname.data,
             password=form.password.data
         )
@@ -66,7 +66,7 @@ def register():
 
 @app.route('/user/<shortname>')
 def user(shortname):
-    user = User.query.filter_by(shortname=shortname).first_or_404()
+    user = User.query.filter_by(shortname=shortname.upper()).first_or_404()
     plot = plot_ratings(shortname, 'elo')
     b_script, b_div = components(plot)
     return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
@@ -124,8 +124,9 @@ def route_edit_user(user_id):
     form = EditUserForm()
     user = User.query.filter_by(id=user_id).first_or_404()
     if form.validate_on_submit():
+        shortname = form.shortname.data.upper()
         print('POST')
-        sn_user = User.query.filter_by(shortname=form.shortname.data).first()
+        sn_user = User.query.filter_by(shortname=shortname).first()
         if sn_user is not None and sn_user.id != user.id:
             flash('That shortname is already taken')
             return redirect(url_for('route_edit_user', user_id=user.id))
@@ -135,7 +136,7 @@ def route_edit_user(user_id):
             return redirect(url_for('route_edit_user', user_id=user.id))
         tasks.update_user(
             user=user,
-            shortname=form.shortname.data,
+            shortname=shortname,
             nickname=form.nickname.data,
         )
         flash(f'User {user} updated')

@@ -103,7 +103,7 @@ def make_new_match(winners, losers, w_score, l_score, importance):
 
 
 def update_user(user, shortname, nickname):
-    user.shortname = shortname
+    user.shortname = shortname.upper()
     user.nickname = nickname
     db.session.commit()
     return user
