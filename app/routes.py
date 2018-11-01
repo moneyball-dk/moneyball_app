@@ -5,9 +5,11 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm
 from app.plots import plot_ratings, components
 import time
+
+from app import tasks
 
 @app.route('/')
 @app.route('/index')
@@ -26,9 +28,9 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(shortname=form.shortname.data.upper()).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password.')
+            flash('Invalid shortname or password.')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -50,19 +52,22 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        init_ratings(user)
-        flash('Congratulations! You are registered.')
+        user = tasks.create_user(
+            shortname=form.shortname.data.upper(),
+            nickname=form.nickname.data,
+            password=form.password.data
+        )
+        if isinstance(user, User):
+            flash('Congratulations! You are registered.')
+        else:
+            flash('Something went wrong')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/user/<username>')
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    plot = plot_ratings(username, 'elo')
+@app.route('/user/<user_id>')
+def user(user_id):
+    user = User.query.filter_by(id=user_id).first_or_404()
+    plot = plot_ratings(user.shortname, 'elo')
     b_script, b_div = components(plot)
     return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
 
@@ -81,7 +86,10 @@ def create_match():
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
-        match = make_new_match(
+        if not current_user.shortname in form.winners.data + form.losers.data:
+            flash('Logged in user should be playing in match')
+            return redirect(url_for('create_match'))
+        match = tasks.make_new_match(
             winners=form.winners.data,
             losers=form.losers.data,
             w_score=form.winner_score.data,
@@ -96,107 +104,45 @@ def create_match():
     return render_template('create_match.html', title='Create match', form=form)
 
 
-def get_match_elo_change(match):
-    Qs = []
-    for players in [match.winning_players, match.losing_players]:
-        elos = [p.get_current_elo() for p in players]
-        avg_elo = sum(elos) / len(elos)
-        Q = 10 ** (avg_elo / 400)
-        Qs.append(Q)
-    Q_w, Q_l = Qs
-    exp_win = Q_w / (Q_w + Q_l)
-    change_w = match.importance * (1 - exp_win)
-    return change_w
-
 @app.route('/recalculate_ratings')
 @login_required
 def route_recalculate_ratings():
-    recalculate_ratings()
+    tasks.recalculate_ratings()
     flash('Recalculated ratings!')
     return redirect(url_for('index'))
-
-
-def recalculate_ratings():
-    users = User.query.all()
-    timestamps = []
-    for u in users:
-        timestamps.append(Rating.query \
-            .filter(Rating.user_id == u.id) \
-            .filter(Rating.rating_type == 'elo') \
-            .order_by(Rating.timestamp) \
-            .first().timestamp )
-    db.session.query(Rating).delete()
-    db.session.commit()
-    for u, t in zip(users, timestamps):
-        init_ratings(u, t)
-
-    matches = Match.query.order_by(Match.timestamp).all()
-    for match in matches:
-        update_match_ratings(match)
-
-def init_ratings(user, timestamp=None):
-    if timestamp is None:
-        timestamp = datetime.now()
-    r_elo = Rating(user=user, rating_type='elo', rating_value=1500, 
-        timestamp=timestamp)
-    r_ts_m = Rating(user=user, rating_type='trueskill_mu', 
-        rating_value=25, timestamp=timestamp)
-    r_ts_s = Rating(user=user, rating_type='trueskill_sigma', 
-        rating_value=8.333, timestamp=timestamp)
-    db.session.add_all([r_elo, r_ts_m, r_ts_s])
-    db.session.commit()
-
-def update_match_ratings(match):
-    elo_change = get_match_elo_change(match)
-    for p in match.winning_players:
-        r = Rating(user=p, match=match, rating_type='elo', 
-        rating_value=p.get_current_elo() + elo_change,
-        timestamp=match.timestamp)
-        db.session.add(r)
-    for p in match.losing_players:
-        r = Rating(user=p, match=match, rating_type='elo',
-        rating_value=p.get_current_elo() - elo_change,
-        timestamp=match.timestamp)
-        db.session.add(r)
-    db.session.commit()
-
 
 @login_required
 @app.route('/delete_match/<match_id>', methods=['POST'])
 def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
-    delete_match(match)
+    tasks.delete_match(match)
     flash('Match deleted')
     return redirect(url_for('index'))
 
-def delete_match(match):
-    db.session.delete(match)
-    db.session.commit()
-    recalculate_ratings()
-
-
-def make_new_match(winners, losers, w_score, l_score, importance):
-    match = Match(
-        winner_score=w_score, 
-        loser_score=l_score,
-        importance=importance)
-    db.session.add(match)
-    db.session.flush()
-
-    for w in winners:
-        user_match = UserMatch(
-            user=w,
-            match=match, 
-            win=True)
-        db.session.add(user_match)
-    for l in losers:
-        user_match = UserMatch(
-            user=l,
-            match=match, 
-            win=False)
-        db.session.add(user_match)
-    db.session.flush()
-    
-    update_match_ratings(match)
-    db.session.commit()
-    return match
+@app.route('/edit_user/<user_id>', methods=['GET', 'POST'])
+def route_edit_user(user_id):
+    form = EditUserForm()
+    user = User.query.filter_by(id=user_id).first_or_404()
+    if form.validate_on_submit():
+        shortname = form.shortname.data.upper()
+        print('POST')
+        sn_user = User.query.filter_by(shortname=shortname).first()
+        if sn_user is not None and sn_user.id != user.id:
+            flash('That shortname is already taken')
+            return redirect(url_for('route_edit_user', user_id=user.id))
+        nn_user = User.query.filter_by(nickname=form.nickname.data).first()
+        if nn_user is not None and nn_user != user:
+            flash('That nickname is already taken')
+            return redirect(url_for('route_edit_user', user_id=user.id))
+        tasks.update_user(
+            user=user,
+            shortname=shortname,
+            nickname=form.nickname.data,
+        )
+        flash(f'User {user} updated')
+        return redirect(url_for('user', user_id=user.id))
+    elif request.method == 'GET':
+        print('GET')
+        form.shortname.data = user.shortname
+        form.nickname.data = user.nickname
+    return render_template('edit_user.html', title='Edit User', form=form)

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block app_content %}
+    <h1>Edit user</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+
+        <d1> {{render_field(form.shortname)}} </d1>
+        <d1> {{render_field(form.nickname)}} </d1>
+
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

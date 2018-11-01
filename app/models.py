@@ -7,8 +7,8 @@ from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(128), index=True, unique=True)
+    shortname = db.Column(db.String(64), index=True, unique=True)
+    nickname = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     matches = db.relationship('Match', 
         secondary='user_match', 
@@ -30,7 +30,10 @@ class User(UserMixin, db.Model):
     )
 
     def __repr__(self):
-        return f'<User - username:{self.username}; id:{self.id}>'
+        return f'<User - shortname:{self.shortname}; id:{self.id}>'
+
+    def __str__(self):
+        return f'({self.shortname}) {self.nickname}'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
