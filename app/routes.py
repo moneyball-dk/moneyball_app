@@ -64,10 +64,10 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/user/<shortname>')
-def user(shortname):
-    user = User.query.filter_by(shortname=shortname.upper()).first_or_404()
-    plot = plot_ratings(shortname, 'elo')
+@app.route('/user/<user_id>')
+def user(user_id):
+    user = User.query.filter_by(id=user_id).first_or_404()
+    plot = plot_ratings(user.shortname, 'elo')
     b_script, b_div = components(plot)
     return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
 
@@ -140,7 +140,7 @@ def route_edit_user(user_id):
             nickname=form.nickname.data,
         )
         flash(f'User {user} updated')
-        return redirect(url_for('user', shortname=user.shortname))
+        return redirect(url_for('user', user_id=user.id))
     elif request.method == 'GET':
         print('GET')
         form.shortname.data = user.shortname
