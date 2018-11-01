@@ -2,8 +2,10 @@
 {% from "_formhelpers.html" import link_match %}
 
 {% block app_content %}
-    <h1>User: {{ user.username }}</h1>
+    <h1>User: {{ user.shortname }}</h1>
+    Nickname: {{ user.nickname }} <br>
     UserID: {{ user.id }} <br>
+    <a href="{{ url_for('route_edit_user', user_id=user.id) }}">Edit User</a>
     <hr>
     {% if matches %}
     <h2>Matches:</h2>

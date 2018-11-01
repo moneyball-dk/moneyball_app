@@ -2,10 +2,10 @@ from app import db
 from app.models import User, Rating, Match, UserMatch
 from datetime import datetime
 
-def create_user(username, email, password):
+def create_user(shortname, nickname, password):
     user = User(
-        username=username,
-        email=email
+        shortname=shortname.upper(),
+        nickname=nickname
     )
     user.set_password(password)
     db.session.add(user)
@@ -100,3 +100,10 @@ def make_new_match(winners, losers, w_score, l_score, importance):
     update_match_ratings(match)
     db.session.commit()
     return match
+
+
+def update_user(user, shortname, nickname):
+    user.shortname = shortname.upper()
+    user.nickname = nickname
+    db.session.commit()
+    return user

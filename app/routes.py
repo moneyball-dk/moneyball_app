@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm
 from app.plots import plot_ratings, components
 import time
 
@@ -28,9 +28,9 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(shortname=form.shortname.data.upper()).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password.')
+            flash('Invalid shortname or password.')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -53,8 +53,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = tasks.create_user(
-            username=form.username.data,
-            email=form.email.data,
+            shortname=form.shortname.data.upper(),
+            nickname=form.nickname.data,
             password=form.password.data
         )
         if isinstance(user, User):
@@ -64,10 +64,10 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/user/<username>')
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    plot = plot_ratings(username, 'elo')
+@app.route('/user/<user_id>')
+def user(user_id):
+    user = User.query.filter_by(id=user_id).first_or_404()
+    plot = plot_ratings(user.shortname, 'elo')
     b_script, b_div = components(plot)
     return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
 
@@ -86,6 +86,9 @@ def create_match():
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
+        if not current_user.shortname in form.winners.data + form.losers.data:
+            flash('Logged in user should be playing in match')
+            return redirect(url_for('create_match'))
         match = tasks.make_new_match(
             winners=form.winners.data,
             losers=form.losers.data,
@@ -115,3 +118,31 @@ def route_delete_match(match_id):
     tasks.delete_match(match)
     flash('Match deleted')
     return redirect(url_for('index'))
+
+@app.route('/edit_user/<user_id>', methods=['GET', 'POST'])
+def route_edit_user(user_id):
+    form = EditUserForm()
+    user = User.query.filter_by(id=user_id).first_or_404()
+    if form.validate_on_submit():
+        shortname = form.shortname.data.upper()
+        print('POST')
+        sn_user = User.query.filter_by(shortname=shortname).first()
+        if sn_user is not None and sn_user.id != user.id:
+            flash('That shortname is already taken')
+            return redirect(url_for('route_edit_user', user_id=user.id))
+        nn_user = User.query.filter_by(nickname=form.nickname.data).first()
+        if nn_user is not None and nn_user != user:
+            flash('That nickname is already taken')
+            return redirect(url_for('route_edit_user', user_id=user.id))
+        tasks.update_user(
+            user=user,
+            shortname=shortname,
+            nickname=form.nickname.data,
+        )
+        flash(f'User {user} updated')
+        return redirect(url_for('user', user_id=user.id))
+    elif request.method == 'GET':
+        print('GET')
+        form.shortname.data = user.shortname
+        form.nickname.data = user.nickname
+    return render_template('edit_user.html', title='Edit User', form=form)

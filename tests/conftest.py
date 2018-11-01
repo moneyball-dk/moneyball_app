@@ -28,8 +28,8 @@ def filled_db(empty_db):
     from app.models import User
     from app.tasks import make_new_match, create_user
 
-    u1 = create_user(username='kasper', email='k@sper.dk', password='123')
-    u2 = create_user(username='felipe', email='f@lipe.dk', password='321')
+    u1 = create_user(shortname='kasper', nickname='7-11', password='123')
+    u2 = create_user(shortname='felipe', nickname='coyote', password='321')
     
     m1 = make_new_match(winners=[u1], losers=[u2], w_score=10, 
         l_score=9, importance=32) # Kasper wins

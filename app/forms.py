@@ -1,34 +1,34 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectMultipleField, IntegerField, SelectField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Optional
+from wtforms.validators import DataRequired, ValidationError, EqualTo, Optional
 
 from app.models import User
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    shortname = StringField('Shortname', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Sign in')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    shortname = StringField('Shortname (eg KWIL)', validators=[DataRequired()])
+    nickname = StringField('Nickname (Eg Flying Cobra)', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat password', validators=[DataRequired(), EqualTo('password')]
         )
     submit = SubmitField('Register')
 
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+    def validate_shortname(self, shortname):
+        user = User.query.filter_by(shortname=shortname.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username')
+            raise ValidationError('Please use a different shortname')
 
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+    def validate_nickname(self, nickname):
+        user = User.query.filter_by(nickname=nickname.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email')
+            raise ValidationError('Please use a different nickname')
 
 class CreateMatchForm(FlaskForm):
     winner_score = IntegerField('Winning Score', validators=[Optional()])
@@ -37,13 +37,11 @@ class CreateMatchForm(FlaskForm):
         'Winners', 
         validators=[DataRequired()],
         query_factory = lambda: User.query,
-        get_label='username'
           )
     losers = QuerySelectMultipleField(
         'Losers', 
         validators=[DataRequired()],
         query_factory = lambda: User.query,
-        get_label='username'
           )
 
     importance = SelectField('Match Importance',
@@ -61,3 +59,9 @@ class CreateMatchForm(FlaskForm):
     def validate_loser_score(self, loser_score):
         if self.winner_score.data <= loser_score.data:
             raise ValidationError('Winning score must be greater than losing score')
+
+
+class EditUserForm(FlaskForm):
+    shortname = StringField('Shortname', validators=[DataRequired()])
+    nickname = StringField('Nickname', validators=[DataRequired()])
+    submit = SubmitField('Submit')
