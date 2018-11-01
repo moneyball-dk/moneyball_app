@@ -32,6 +32,9 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User - shortname:{self.shortname}; id:{self.id}>'
 
+    def __str__(self):
+        return f'({self.shortname}) {self.nickname}'
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

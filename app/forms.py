@@ -37,13 +37,11 @@ class CreateMatchForm(FlaskForm):
         'Winners', 
         validators=[DataRequired()],
         query_factory = lambda: User.query,
-        get_label='shortname'
           )
     losers = QuerySelectMultipleField(
         'Losers', 
         validators=[DataRequired()],
         query_factory = lambda: User.query,
-        get_label='shortname'
           )
 
     importance = SelectField('Match Importance',
