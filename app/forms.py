@@ -45,7 +45,7 @@ class CreateMatchForm(FlaskForm):
           )
 
     importance = SelectField('Match Importance',
-        choices=[(k, k) for k in [16, 32]], 
+        choices=[(k, k) for k in [8, 16, 32]], 
         coerce=int, 
         default=16)
     submit = SubmitField('Submit')
