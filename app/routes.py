@@ -86,7 +86,7 @@ def create_match():
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
-        if not current_user.shortname in form.winners.data + form.losers.data:
+        if not current_user in form.winners.data + form.losers.data:
             flash('Logged in user should be playing in match')
             return redirect(url_for('create_match'))
         match = tasks.make_new_match(
