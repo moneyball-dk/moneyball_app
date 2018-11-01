@@ -33,8 +33,8 @@ def test_users(filled_db):
     
     assert len(users) == 2
     u1, u2 = users
-    assert u1.shortname == 'kasper'
-    assert u2.shortname == 'felipe'
+    assert u1.shortname == 'KASPER'
+    assert u2.shortname == 'FELIPE'
 
     assert len(u1.matches) == 3
     assert len(u1.won_matches) == 2

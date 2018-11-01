@@ -4,7 +4,7 @@ from datetime import datetime
 
 def create_user(shortname, nickname, password):
     user = User(
-        shortname=shortname,
+        shortname=shortname.upper(),
         nickname=nickname
     )
     user.set_password(password)
