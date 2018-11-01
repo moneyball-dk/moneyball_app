@@ -14,7 +14,7 @@ t
 
 {% macro link_user(user) %}
   <p>
-    <a href="/user/{{ user.username }}">{{user.username}}</a>
+    <a href="/user/{{ user.shortname }}">{{user.shortname}}</a>
   </p>
 {% endmacro %}
 
@@ -29,6 +29,6 @@ t
 
 
 {% macro link_user_elo(user) %}
-    <a href="/user/{{ user.username }}">{{user.username}}</a> - 
+    <a href="/user/{{ user.shortname }}">{{user.shortname}}</a> - 
       Current Elo: {{user.get_current_elo()|round}}
 {% endmacro %}

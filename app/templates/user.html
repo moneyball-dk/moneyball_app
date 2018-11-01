@@ -2,7 +2,7 @@
 {% from "_formhelpers.html" import link_match %}
 
 {% block app_content %}
-    <h1>User: {{ user.username }}</h1>
+    <h1>User: {{ user.shortname }}</h1>
     UserID: {{ user.id }} <br>
     <hr>
     {% if matches %}

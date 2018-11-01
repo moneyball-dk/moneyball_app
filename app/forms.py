@@ -6,29 +6,29 @@ from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Op
 from app.models import User
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    shortname = StringField('Shortname', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
     submit = SubmitField('Sign in')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    shortname = StringField('Shortname (eg KWIL)', validators=[DataRequired()])
+    nickname = StringField('Nickname (Eg Flying Cobra)', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat password', validators=[DataRequired(), EqualTo('password')]
         )
     submit = SubmitField('Register')
 
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+    def validate_shortname(self, shortname):
+        user = User.query.filter_by(shortname=shortname.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username')
+            raise ValidationError('Please use a different shortname')
 
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+    def validate_nickname(self, email):
+        user = User.query.filter_by(nickname=nickname.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email')
+            raise ValidationError('Please use a different nickname')
 
 class CreateMatchForm(FlaskForm):
     winner_score = IntegerField('Winning Score', validators=[Optional()])
@@ -37,13 +37,13 @@ class CreateMatchForm(FlaskForm):
         'Winners', 
         validators=[DataRequired()],
         query_factory = lambda: User.query,
-        get_label='username'
+        get_label='shortname'
           )
     losers = QuerySelectMultipleField(
         'Losers', 
         validators=[DataRequired()],
         query_factory = lambda: User.query,
-        get_label='username'
+        get_label='shortname'
           )
 
     importance = SelectField('Match Importance',

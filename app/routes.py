@@ -28,9 +28,9 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(shortname=form.shortname.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password.')
+            flash('Invalid shortname or password.')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -53,7 +53,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = tasks.create_user(
-            username=form.username.data,
+            shortname=form.shortname.data,
             email=form.email.data,
             password=form.password.data
         )
@@ -64,10 +64,10 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/user/<username>')
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    plot = plot_ratings(username, 'elo')
+@app.route('/user/<shortname>')
+def user(shortname):
+    user = User.query.filter_by(shortname=shortname).first_or_404()
+    plot = plot_ratings(shortname, 'elo')
     b_script, b_div = components(plot)
     return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
 
@@ -86,6 +86,9 @@ def create_match():
         return redirect(url_for('index'))
     form = CreateMatchForm()
     if form.validate_on_submit():
+        if not current_user.shortname in form.winners.data + form.losers.data:
+            flash('Logged in user should be playing in match')
+            return redirect(url_for('create_match'))
         match = tasks.make_new_match(
             winners=form.winners.data,
             losers=form.losers.data,
