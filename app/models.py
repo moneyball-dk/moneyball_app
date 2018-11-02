@@ -53,7 +53,9 @@ class User(UserMixin, db.Model):
 
     def get_current_trueskill(self):
         mu = Rating.query \
-            .filter(and_(Rating.user_id == self.id), Rating.rating_type == 'trueskill_mu') \
+            .filter(and_(
+                Rating.user_id == self.id), 
+                Rating.rating_type == 'trueskill_mu') \
             .order_by(Rating.timestamp.desc()) \
             .first()
         sigma = Rating.query \
