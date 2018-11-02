@@ -119,7 +119,7 @@ def route_delete_match(match_id):
     flash('Match deleted')
     return redirect(url_for('index'))
 
-@app.route('/edit_user/<user_id>', methods=['GET', 'POST'])
+@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 def route_edit_user(user_id):
     form = EditUserForm()
     user = User.query.filter_by(id=user_id).first_or_404()
