@@ -1,6 +1,7 @@
 from app import db
 from app.models import User, Rating, Match, UserMatch
 from datetime import datetime
+import trueskill as ts
 
 def create_user(shortname, nickname, password):
     user = User(
@@ -50,6 +51,7 @@ def delete_match(match):
 
 def update_match_ratings(match):
     elo_change = get_match_elo_change(match)
+    update_trueskill_by_match(match)
     for p in match.winning_players:
         r = Rating(user=p, match=match, rating_type='elo', 
         rating_value=p.get_current_elo() + elo_change,
@@ -61,6 +63,39 @@ def update_match_ratings(match):
         timestamp=match.timestamp)
         db.session.add(r)
     db.session.commit()
+
+def update_trueskill_by_match(match):
+    w_ratings = []
+    l_ratings = []
+    for p in match.winning_players:
+        mu, sigma = p.get_current_trueskill()
+        w_ratings.append(ts.Rating(mu, sigma))
+
+    for p in match.losing_players:
+        mu, sigma = p.get_current_trueskill()
+        l_ratings.append(ts.Rating(mu, sigma))
+
+    rating_groups = [w_ratings, l_ratings]
+    new_ratings = ts.rate(rating_groups, ranks=[0,1])
+    players = match.winning_players + match.losing_players
+    new_ratings_flat = [item for sublist in new_ratings for item in sublist]
+    for player, rating in zip(players, new_ratings_flat):
+        r_m = Rating(
+            user=player,
+            match=match,
+            rating_type='trueskill_mu',
+            rating_value=rating.mu,
+            timestamp=match.timestamp,
+        )
+        r_s = Rating(
+            user=player,
+            match=match,
+            rating_type='trueskill_sigma',
+            rating_value=rating.sigma,
+            timestamp=match.timestamp,
+        )
+        db.session.add_all([r_m, r_s])
+        db.session.commit()
 
 def get_match_elo_change(match):
     Qs = []

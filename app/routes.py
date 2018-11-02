@@ -119,13 +119,12 @@ def route_delete_match(match_id):
     flash('Match deleted')
     return redirect(url_for('index'))
 
-@app.route('/edit_user/<user_id>', methods=['GET', 'POST'])
+@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 def route_edit_user(user_id):
     form = EditUserForm()
     user = User.query.filter_by(id=user_id).first_or_404()
     if form.validate_on_submit():
         shortname = form.shortname.data.upper()
-        print('POST')
         sn_user = User.query.filter_by(shortname=shortname).first()
         if sn_user is not None and sn_user.id != user.id:
             flash('That shortname is already taken')
@@ -142,7 +141,6 @@ def route_edit_user(user_id):
         flash(f'User {user} updated')
         return redirect(url_for('user', user_id=user.id))
     elif request.method == 'GET':
-        print('GET')
         form.shortname.data = user.shortname
         form.nickname.data = user.nickname
     return render_template('edit_user.html', title='Edit User', form=form)
