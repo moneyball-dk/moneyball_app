@@ -11,3 +11,4 @@ psycopg2
 bokeh
 numpy
 pytest
+trueskill

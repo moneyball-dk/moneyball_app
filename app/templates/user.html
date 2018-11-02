@@ -23,6 +23,7 @@
 
     <h2>Stats</h2>
     Elo: {{ user.get_current_elo()|round|int }} <br>
+    Trueskill: {{ user.get_current_trueskill()[0]|round }} +- {{ user.get_current_trueskill()[1]|round }} <br>
     {% set denom = (user.won_matches|length + user.lost_matches|length) %}
     {% if denom == 0 %}
         {% set winrate = "Undefined " %}
