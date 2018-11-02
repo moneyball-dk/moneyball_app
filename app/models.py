@@ -51,7 +51,7 @@ class User(UserMixin, db.Model):
         except AttributeError:
             return 1500
 
-    def get_trueskill(self):
+    def get_current_trueskill(self):
         mu = Rating.query \
             .filter(and_(Rating.user_id == self.id), Rating.rating_type == 'trueskill_mu') \
             .order_by(Rating.timestamp.desc()) \
