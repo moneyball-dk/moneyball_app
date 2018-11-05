@@ -120,6 +120,7 @@ def route_delete_match(match_id):
     flash('Match deleted')
     return redirect(url_for('index'))
 
+@login_required
 @app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 def route_edit_user(user_id):
     form = EditUserForm()
@@ -146,9 +147,23 @@ def route_edit_user(user_id):
         form.nickname.data = user.nickname
     return render_template('edit_user.html', title='Edit User', form=form)
 
+@login_required
 @app.route('/match/<match_id>/approve', methods=['POST'])
 def route_approve_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     msg = tasks.approve_match(match, approver=current_user)
     flash(msg)
     return redirect(url_for('index'))
+
+@login_required
+@app.route('/user/<user_id>/approval_pending')
+def route_approval_pending(user_id):
+    user = User.query.filter_by(id=user_id).first_or_404()
+    matches = user.matches
+    matches_pending_user_approval = []
+    for m in matches:
+        if user.can_approve_match(m):
+            matches_pending_user_approval.append(m)
+
+    return render_template('approval_pending.html', matches=matches_pending_user_approval)
+
