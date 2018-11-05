@@ -94,7 +94,8 @@ def create_match():
             losers=form.losers.data,
             w_score=form.winner_score.data,
             l_score=form.loser_score.data,
-            importance=form.importance.data
+            importance=form.importance.data,
+            user_creating_match=current_user,
             )
         if isinstance(match, Match):
             flash('Match created')
