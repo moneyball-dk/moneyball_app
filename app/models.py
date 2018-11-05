@@ -80,6 +80,15 @@ class User(UserMixin, db.Model):
         except AttributeError:
             return 0
 
+    def can_approve_match(self, match):
+        if self in match.winning_players and not match.approved_winner:
+            return True
+        if self in match.losing_players and not match.approved_loser:
+            return True
+        else:
+            return False
+        
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -101,6 +110,8 @@ class Match(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
     ratings = db.relationship('Rating')
+    approved_winner = db.Column(db.Boolean, default=False)
+    approved_loser = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'<Match - match_id:{self.id}>'
