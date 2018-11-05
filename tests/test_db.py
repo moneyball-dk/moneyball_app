@@ -76,11 +76,48 @@ def test_delete_match(filled_db):
 def test_create_user(filled_db):
     from app.tasks import create_user
 
-    u = create_user(
+    u1 = create_user(
         'NU',
         'New User',
         'hunter2'
     )
 
-    assert u.shortname == 'NU'
-    assert u.password_hash != 'hunter2'
+    assert u1.shortname == 'NU'
+    assert u1.password_hash != 'hunter2'
+
+    with pytest.raises(AssertionError):
+        u1 = create_user(
+            'NU',
+            'New User',
+            'hunter2'
+        )
+
+
+def test_approve_match(filled_db):
+    from app.tasks import approve_match, make_new_match
+    from app.models import User
+
+    u1, u2 = User.query.all()
+    elo1, elo2 = u1.get_current_elo(), u2.get_current_elo()
+
+    m = make_new_match(winners=[u1], losers=[u2], w_score=10, l_score=4,
+        importance=16)
+    
+    assert elo1 == u1.get_current_elo()
+    assert elo2 == u2.get_current_elo()
+
+    assert u1.can_approve_match(m)
+    assert u2.can_approve_match(m)
+
+    approve_match(m, u1)
+    assert elo1 == u1.get_current_elo()
+    assert elo2 == u2.get_current_elo()
+    assert not u1.can_approve_match(m)
+    assert u2.can_approve_match(m)
+    
+
+    approve_match(m, u2)
+    assert elo1 != u1.get_current_elo()
+    assert elo2 != u2.get_current_elo()
+    assert not u1.can_approve_match(m)
+    assert not u2.can_approve_match(m)

@@ -144,3 +144,10 @@ def route_edit_user(user_id):
         form.shortname.data = user.shortname
         form.nickname.data = user.nickname
     return render_template('edit_user.html', title='Edit User', form=form)
+
+@app.route('/match/<match_id>/approve', methods=['POST'])
+def route_approve_match(match_id):
+    match = Match.query.filter_by(id=match_id).first_or_404()
+    msg = tasks.approve_match(match, approver=current_user)
+    flash(msg)
+    return redirect(url_for('index'))

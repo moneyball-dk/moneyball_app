@@ -26,17 +26,21 @@ def empty_db(test_client):
 @pytest.fixture(scope='function')
 def filled_db(empty_db):
     from app.models import User
-    from app.tasks import make_new_match, create_user
+    from app.tasks import make_new_match, create_user, approve_match
 
     u1 = create_user(shortname='kasper', nickname='7-11', password='123')
     u2 = create_user(shortname='felipe', nickname='coyote', password='321')
     
     m1 = make_new_match(winners=[u1], losers=[u2], w_score=10, 
-        l_score=9, importance=32) # Kasper wins
+        l_score=9, importance=32, user_creating_match=u1) # Kasper wins
     m2 = make_new_match(winners=[u1], losers=[u2], w_score=10, 
-        l_score=9, importance=16) # Kasper wins
+        l_score=9, importance=16, user_creating_match=u1) # Kasper wins
     m3 = make_new_match(winners=[u2], losers=[u1], w_score=10, 
-        l_score=9, importance=16) # Felipe Wins
+        l_score=9, importance=16, user_creating_match=u1) # Felipe Wins
+
+    approve_match(m1, u2)
+    approve_match(m2, u2)
+    approve_match(m3, u2)
     yield empty_db
     empty_db.session.remove()
     empty_db.drop_all()

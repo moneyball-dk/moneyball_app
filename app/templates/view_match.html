@@ -8,10 +8,22 @@
     </p>
     {% if match.players %}
         <h2>Winning players</h2>
+            Approved by winner:
+        {% if match.approved_winner %}
+            ✔️
+        {% else %}
+            ❌
+        {% endif %}
         {% for p in match.winning_players %}
             {{link_user(p)}}
         {% endfor %}
         <h2>Losing players</h2>
+            Approved by loser:
+        {% if match.approved_loser %}
+            ✔️
+        {% else %}
+            ❌
+        {% endif %}
         {% for p in match.losing_players %}
             {{link_user(p)}}
         {% endfor %}
@@ -19,6 +31,12 @@
 
     <h2>Score</h2>
     {{ match.winner_score }} - {{match.loser_score}}
+
+    {% if current_user.can_approve_match(match) %}
+    <h2>Approve match?</h2>
+    <form action="{{url_for('route_approve_match', match_id=match.id)}}" method='post'>
+        <button type="submit" class="btn-link">Click here to approve</button>
+    {% endif %}
 
     <h2>Delete match?</h2>
     <form action="{{url_for('route_delete_match', match_id=match.id)}}" method='post'>
