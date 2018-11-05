@@ -4,6 +4,13 @@ from datetime import datetime
 import trueskill as ts
 
 def create_user(shortname, nickname, password):
+    sn_user = User.query.filter(User.shortname == shortname.upper()).first()
+    nn_user = User.query.filter(User.nickname == nickname).first()
+    if sn_user is not None:
+        raise AssertionError('Someone has already used that shortname')
+    if nn_user is not None:
+        raise AssertionError('Someone has already used that nickname')
+    
     user = User(
         shortname=shortname.upper(),
         nickname=nickname
@@ -30,6 +37,8 @@ def recalculate_ratings():
     users = User.query.all()
     timestamps = []
     for u in users:
+        # Get the first timestamp on Rating for each User
+        # To initialize first Rating at earliest record of the user. 
         timestamps.append(Rating.query \
             .filter(Rating.user_id == u.id) \
             .filter(Rating.rating_type == 'elo') \
@@ -40,7 +49,10 @@ def recalculate_ratings():
     for u, t in zip(users, timestamps):
         init_ratings(u, t)
 
-    matches = Match.query.order_by(Match.timestamp).all()
+    matches = Match.query \
+        .filter(Match.approved_winner == True) \
+        .filter(Match.approved_loser == True) \
+        .order_by(Match.timestamp).all()
     for match in matches:
         update_match_ratings(match)
 
@@ -50,8 +62,14 @@ def delete_match(match):
     recalculate_ratings()
 
 def update_match_ratings(match):
-    elo_change = get_match_elo_change(match)
+    if not match.approved_winner or not match.approved_loser:
+        # Don't update ratings, as match is not approved
+        return False
     update_trueskill_by_match(match)
+    update_elo_by_match(match)
+
+def update_elo_by_match(match):
+    elo_change = get_match_elo_change(match)
     for p in match.winning_players:
         r = Rating(user=p, match=match, rating_type='elo', 
         rating_value=p.get_current_elo() + elo_change,
@@ -99,7 +117,9 @@ def update_trueskill_by_match(match):
 
 def get_match_elo_change(match):
     Qs = []
+    # First, get all winning players, then all losing players
     for players in [match.winning_players, match.losing_players]:
+        # Get the avg elo for each team seperately
         elos = [p.get_current_elo() for p in players]
         avg_elo = sum(elos) / len(elos)
         Q = 10 ** (avg_elo / 400)
@@ -109,12 +129,31 @@ def get_match_elo_change(match):
     change_w = match.importance * (1 - exp_win)
     return change_w
 
+def approve_match(match, approver):
+    if approver in match.winning_players:
+        match.approved_winner = True
+    elif approver in match.losing_players:
+        match.approved_loser = True
+    else:
+        # User not playing
+        return 'Cant approve match. You are not a player in this match'
+    db.session.commit()
+    recalculate_ratings()
+    return 'Match approved'
 
-def make_new_match(winners, losers, w_score, l_score, importance):
+def make_new_match(winners, losers, w_score, l_score, importance, 
+    user_creating_match=None):
+    approved_winner, approved_loser = False, False
+    if user_creating_match in winners:
+        approved_winner = True
+    elif user_creating_match in losers:
+        approved_loser = True
     match = Match(
         winner_score=w_score, 
         loser_score=l_score,
-        importance=importance)
+        importance=importance,
+        approved_winner=approved_winner,
+        approved_loser=approved_loser)
     db.session.add(match)
     db.session.flush()
 

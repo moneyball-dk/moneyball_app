@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import link_match %}
+
+{% block app_content %}
+    {% if matches %}
+        {% for m in matches %}
+            {{link_match(m, current_user)}}
+        {% endfor %}
+    {% else %}
+        <p>
+            No matches need approval. Go play some more foosball!
+        </p>
+    {% endif %}
+{% endblock %}

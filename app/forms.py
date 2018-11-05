@@ -21,7 +21,7 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_shortname(self, shortname):
-        user = User.query.filter_by(shortname=shortname.data).first()
+        user = User.query.filter_by(shortname=shortname.data.upper()).first()
         if user is not None:
             raise ValidationError('Please use a different shortname')
 
