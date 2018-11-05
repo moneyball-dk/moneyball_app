@@ -22,7 +22,13 @@ t
   <p>
     <a href="/match/{{ match.id }}">Match ID: {{match.id}} - Score {{match.winner_score}}-{{match.loser_score}}</a>
     {% if user %}
-    - Elo after match: {{ user.get_match_rating_value(match, 'elo')|round}}
+      - Elo after match: {{ user.get_match_rating_value(match, 'elo')|round}} 
+      - Approved:
+      {% if match.approved_winner and match.approved_loser %}
+        ️️✔️
+      {% else %}
+        ❌
+      {% endif %}
     {% endif %}
   </p>
 {% endmacro %}
