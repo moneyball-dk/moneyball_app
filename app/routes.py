@@ -141,6 +141,7 @@ def route_edit_user():
             user=user,
             shortname=shortname,
             nickname=form.nickname.data,
+            password=form.password.data,
         )
         flash(f'User {user} updated')
         return redirect(url_for('user', user_id=user.id))
