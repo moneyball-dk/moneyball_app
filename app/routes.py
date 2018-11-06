@@ -112,19 +112,21 @@ def route_recalculate_ratings():
     flash('Recalculated ratings!')
     return redirect(url_for('index'))
 
-@login_required
 @app.route('/delete_match/<match_id>', methods=['POST'])
+@login_required
 def route_delete_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     tasks.delete_match(match)
     flash('Match deleted')
     return redirect(url_for('index'))
 
+@app.route('/edit_user', methods=['GET', 'POST'])
+#@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 @login_required
-@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
-def route_edit_user(user_id):
+def route_edit_user():
     form = EditUserForm()
-    user = User.query.filter_by(id=user_id).first_or_404()
+    user = current_user
+    #user = User.query.filter_by(id=user_id).first_or_404()
     if form.validate_on_submit():
         shortname = form.shortname.data.upper()
         sn_user = User.query.filter_by(shortname=shortname).first()
@@ -147,16 +149,16 @@ def route_edit_user(user_id):
         form.nickname.data = user.nickname
     return render_template('edit_user.html', title='Edit User', form=form)
 
-@login_required
 @app.route('/match/<match_id>/approve', methods=['POST'])
+@login_required
 def route_approve_match(match_id):
     match = Match.query.filter_by(id=match_id).first_or_404()
     msg = tasks.approve_match(match, approver=current_user)
     flash(msg)
     return redirect(url_for('index'))
 
-@login_required
 @app.route('/user/<user_id>/approval_pending')
+@login_required
 def route_approval_pending(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
     matches = user.matches

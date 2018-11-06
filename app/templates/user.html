@@ -6,7 +6,7 @@
     Nickname: {{ user.nickname }} <br>
     UserID: {{ user.id }} <br>
     {% if user == current_user %}
-    <a href="{{ url_for('route_edit_user', user_id=user.id) }}">Edit User</a>
+    <a href="{{ url_for('route_edit_user') }}">Edit User</a>
     {% endif %}
     <hr>
     {% if matches %}
