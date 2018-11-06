@@ -4,6 +4,7 @@
 {% block app_content %}
     <h1>Match details</h1>
     <p>Match id: {{ match.id }}<br>
+    Importance: {{ match.importance }}<br>
     Game played: {{ moment(match.timestamp).calendar() }}
     </p>
     {% if match.players %}
