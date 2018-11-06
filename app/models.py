@@ -11,18 +11,21 @@ class User(UserMixin, db.Model):
     nickname = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     matches = db.relationship('Match', 
+        order_by="Match.timestamp",
         secondary='user_match', 
         primaryjoin="user_match.c.user_id == user.c.id",
         backref=db.backref('players', lazy=True)
     )
 
     won_matches = db.relationship('Match',
+        order_by="Match.timestamp",
         secondary='user_match',
         primaryjoin="and_(user_match.c.user_id == user.c.id, user_match.c.win == True)",
         backref=db.backref('winning_players'),
         viewonly=True,
     )
     lost_matches = db.relationship('Match',
+        order_by="Match.timestamp",
         secondary='user_match',
         primaryjoin="and_(user_match.c.user_id == user.c.id, user_match.c.win == False)",
         backref=db.backref('losing_players'),
