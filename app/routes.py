@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, EditPasswordForm
 from app.plots import plot_ratings, components
 import time
 
@@ -141,7 +141,7 @@ def route_edit_user():
             user=user,
             shortname=shortname,
             nickname=form.nickname.data,
-            password=form.password.data,
+            #password=form.password.data,
         )
         flash(f'User {user} updated')
         return redirect(url_for('user', user_id=user.id))
@@ -149,6 +149,23 @@ def route_edit_user():
         form.shortname.data = user.shortname
         form.nickname.data = user.nickname
     return render_template('edit_user.html', title='Edit User', form=form)
+
+@app.route('/edit_user_password', methods=['GET', 'POST'])
+#@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
+@login_required
+def route_edit_password():
+    form = EditPasswordForm()
+    user = current_user
+    #user = User.query.filter_by(id=user_id).first_or_404()
+    if form.validate_on_submit():
+        tasks.update_password(
+            user=user,
+            password=form.password.data,
+        )
+        flash(f'Password of user {user} updated')
+        return redirect(url_for('user', user_id=user.id))
+    return render_template('edit_user_password.html', title='Moneyball', form=form)
+
 
 @app.route('/match/<match_id>/approve', methods=['POST'])
 @login_required
