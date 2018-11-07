@@ -181,3 +181,9 @@ def update_user(user, shortname, nickname):
     user.nickname = nickname
     db.session.commit()
     return user
+
+def update_password(user, password):
+    if password is not None:
+        user.set_password(password)
+    db.session.commit()
+    return user

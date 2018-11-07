@@ -64,4 +64,18 @@ class CreateMatchForm(FlaskForm):
 class EditUserForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
     nickname = StringField('Nickname', validators=[DataRequired()])
+    #password = PasswordField('Password', validators=[DataRequired()])
+    #password2 = PasswordField(
+    #    'Repeat password', validators=[DataRequired(), EqualTo('password')]
+    #    )
+    submit = SubmitField('Submit')
+
+
+class EditPasswordForm(FlaskForm):
+    #shortname = StringField('Shortname', validators=[DataRequired()])
+    #nickname = StringField('Nickname', validators=[DataRequired()])
+    password = PasswordField('New password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat new password', validators=[DataRequired(), EqualTo('password')]
+        )
     submit = SubmitField('Submit')
