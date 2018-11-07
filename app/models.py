@@ -76,12 +76,21 @@ class User(UserMixin, db.Model):
         rating = Rating.query \
             .filter(Rating.user_id == self.id) \
             .filter(Rating.match_id == match.id) \
-            .filter(Rating.rating_type == 'elo') \
+            .filter(Rating.rating_type == rating_type) \
             .first()
         try:
             return rating.rating_value
         except AttributeError:
             return 0
+
+    def get_current_rating(self, rating_type='elo'):
+        if rating_type == 'trueskill':
+            (mu, sigma) = self.get_current_trueskill()
+            rating = mu - (3*sigma)
+        elif rating_type == 'elo':
+            rating = self.get_current_elo()
+        else: raise AssertionError(f'wrong rating_type: {rating_type}')
+        return rating
 
     def can_approve_match(self, match):
         if self in match.winning_players and not match.approved_winner:

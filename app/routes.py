@@ -5,21 +5,21 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting
 from app.plots import plot_ratings, components
 import time
 
 from app import tasks
 
-@app.route('/')
-@app.route('/index')
-def index():
-    try:
-        users = User.query.all()
-        users = sorted(users, key=lambda u: u.get_current_elo(), reverse=True)
-    except:
-        users = None
-    return render_template('index.html', title='Home', users=users)
+#@app.route('/')
+@app.route('/index', methods=['GET', 'POST'])
+def index(sorting='elo'):
+    form = ChooseLeaderboardSorting()
+    sorting = form.sorting.data
+    users = User.query.all()
+    users = sorted(users, key=lambda u: u.get_current_rating(rating_type=sorting), reverse=True)
+    print(form.sorting.data)
+    return render_template('index.html', title='Home', users=users, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -169,4 +169,3 @@ def route_approval_pending(user_id):
             matches_pending_user_approval.append(m)
 
     return render_template('approval_pending.html', matches=matches_pending_user_approval)
-
