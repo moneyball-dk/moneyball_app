@@ -176,8 +176,10 @@ def make_new_match(winners, losers, w_score, l_score, importance,
     return match
 
 
-def update_user(user, shortname, nickname):
+def update_user(user, shortname, nickname, password=None):
     user.shortname = shortname.upper()
     user.nickname = nickname
+    if password is not None:
+        user.set_password(password)
     db.session.commit()
     return user
