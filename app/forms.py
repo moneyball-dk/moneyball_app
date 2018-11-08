@@ -79,3 +79,9 @@ class EditPasswordForm(FlaskForm):
         'Repeat new password', validators=[DataRequired(), EqualTo('password')]
         )
     submit = SubmitField('Submit')
+
+class ChooseLeaderboardSorting(FlaskForm):
+    sorting =SelectField('Sorting', 
+        choices=[('elo', 'Elo'), ('trueskill', 'Trueskill')],
+        default='elo')
+    submit = SubmitField('Submit')

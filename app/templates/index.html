@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import link_user_elo %}
+{% from "_formhelpers.html" import link_user_rating, render_field %}
 
 {% block app_content %} 
   {% if current_user.is_anonymous %}
@@ -29,11 +29,15 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   {% else %}
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <d1> {{ render_field(form.sorting)}}  {{ form.submit() }} </d1>
+    </form>
     Highest ranking players:
     <ol>
     {% for  u in users %}
       <li>
-        {{link_user_elo(u)}}
+        {{link_user_rating(u, form.sorting.data)}}
       </li>
     {% endfor %}
     </ol>

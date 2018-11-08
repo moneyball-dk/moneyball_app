@@ -38,3 +38,8 @@ t
     <a href="/user/{{ user.id }}">{{user}}</a> - 
       Current Elo: {{user.get_current_elo()|round}}
 {% endmacro %}
+
+{% macro link_user_rating(user, sorting) %}
+    <a href="/user/{{ user.id }}">{{user}}</a> - 
+      Current rating: {{user.get_current_rating(sorting)|round}}
+{% endmacro %}
