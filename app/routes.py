@@ -12,14 +12,13 @@ import time
 
 from app import tasks
 
-#@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index(sorting='elo'):
     form = ChooseLeaderboardSorting()
     sorting = form.sorting.data
     users = User.query.all()
     users = sorted(users, key=lambda u: u.get_current_rating(rating_type=sorting), reverse=True)
-    print(form.sorting.data)
     return render_template('index.html', title='Home', users=users, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
