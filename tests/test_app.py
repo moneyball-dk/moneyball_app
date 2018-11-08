@@ -1,6 +1,6 @@
 import pytest
 
-def test_index_page(test_client):
+def test_index_page(test_client, filled_db):
     response = test_client.get('/')
     assert response.status_code == 200
     assert b'Moneyball' in response.data
