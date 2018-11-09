@@ -121,6 +121,7 @@ def test_user_page(test_client, filled_db):
     response = test_client.get('/user/1')
     assert response.status_code == 200
     assert b'User' in response.data
+    assert b'UserID: 1' in response.data
 
     # Test 404 error for wrong user id
     response = test_client.get('/user/1000')
@@ -134,7 +135,25 @@ def test_user_page(test_client, filled_db):
     assert b'Winrate: Undefined' in response.data
 
     # TODO: Is there any way to test plotting functions
-    assert True
+
+def test_match_page(test_client, filled_db):
+    # Test match page when not logged in 
+    response = test_client.get('/match/1')
+    assert response.status_code == 200
+    assert b'Match details' in response.data
+    assert b'Winning players' in response.data
+    assert b'KASPER' in response.data
+    
+    # Test match page when logged in
+    login(test_client, 'kasper', '123')
+    response = test_client.get('/match/1')
+    assert b'Delete match?' in response.data
+
+    # Test 404 page
+    response = test_client.get('/match/1000')
+    assert response.status_code == 404
+
+    
 
 def login(client, shortname, password):
     return client.post('/login', data=dict(

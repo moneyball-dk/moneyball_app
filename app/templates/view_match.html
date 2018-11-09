@@ -33,14 +33,16 @@
     <h2>Score</h2>
     {{ match.winner_score }} - {{match.loser_score}}
 
-    {% if current_user.can_approve_match(match) %}
-    <h2>Approve match?</h2>
-    <form action="{{url_for('route_approve_match', match_id=match.id)}}" method='post'>
-        <button type="submit" class="btn-link">Click here to approve</button>
-    {% endif %}
+    {% if current_user.is_authenticated %}
+        {% if current_user.can_approve_match(match) %}
+        <h2>Approve match?</h2>
+        <form action="{{url_for('route_approve_match', match_id=match.id)}}" method='post'>
+            <button type="submit" class="btn-link">Click here to approve</button>
+        {% endif %}
 
-    <h2>Delete match?</h2>
-    <form action="{{url_for('route_delete_match', match_id=match.id)}}" method='post'>
-        <button type="submit" class="btn-link">Click here to delete</button>
-    </form>
+        <h2>Delete match?</h2>
+        <form action="{{url_for('route_delete_match', match_id=match.id)}}" method='post'>
+            <button type="submit" class="btn-link">Click here to delete</button>
+        </form>
+    {% endif %}
 {% endblock %}
