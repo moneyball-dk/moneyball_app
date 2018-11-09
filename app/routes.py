@@ -71,7 +71,8 @@ def user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
     plot = plot_ratings(user.shortname, 'elo')
     b_script, b_div = components(plot)
-    return render_template('user.html', user=user, matches=user.matches, b_script=b_script, b_div=b_div)
+    return render_template('user.html', user=user, matches=user.matches, 
+        b_script=b_script, b_div=b_div, title='User')
 
 
 @app.route('/match/<match_id>')
