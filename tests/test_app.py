@@ -57,7 +57,7 @@ def test_login(test_client, filled_db):
 
 def test_register(test_client, filled_db):
     # Register new user
-    response = register(
+    response = register_user(
         test_client, 
         shortname='NEWUSER',
         nickname='New guy',
@@ -85,7 +85,7 @@ def test_register(test_client, filled_db):
     logout(test_client)
 
     # Register same shortname
-    response = register(
+    response = register_user(
         test_client, 
         shortname='NEWUSER',
         nickname='changed-nick',
@@ -96,7 +96,7 @@ def test_register(test_client, filled_db):
     assert b'Register' in response.data
 
     # Register same nickname
-    response = register(
+    response = register_user(
         test_client, 
         shortname='changeshort',
         nickname='New guy',
@@ -107,7 +107,7 @@ def test_register(test_client, filled_db):
     assert b'Register' in response.data
 
     # Register different passwords
-    response = register(
+    response = register_user(
         test_client, 
         shortname='changeshort',
         nickname='change-nick',
@@ -153,9 +153,48 @@ def test_match_page(test_client, filled_db):
     response = test_client.get('/match/1000')
     assert response.status_code == 404
 
-    
+def test_create_match_page(test_client, filled_db):
+    from app.models import User
+    u1, u2 = User.query.all()
+    logout(test_client)
+    response = register_match(
+        test_client,
+        [u1.id],
+        [u2.id],
+        10,
+        6, 
+        16
+    )
+    assert b'Please log in to access this page' in response.data
+    assert response.status_code == 200
 
-def login(client, shortname, password):
+    login(test_client)
+    response = register_match(
+        test_client,
+        [u1.id],
+        [u2.id],
+        10,
+        6, 
+        16
+    )
+    assert b'Match created' in response.data
+    assert response.status_code == 200
+
+@pytest.mark.parametrize(
+    ('winner_ids', 'loser_ids', 'w_score', 'l_score', 'message'), (
+    ([1], [2], 10, 7, b'Match created'),
+    ([1], [1], 10, 7, b'Same user cannot be both winner and loser'),
+    ([1], [2], 1, 10, b'Winning score must be greater than losing score')
+))
+def test_create_match_validate_input(test_client, filled_db,
+    winner_ids, loser_ids, w_score, l_score, message):
+    login(test_client)
+    response = register_match( test_client, 
+        winner_ids, loser_ids, w_score, l_score, 16)
+    assert message in response.data
+
+
+def login(client, shortname='kasper', password='123'):
     return client.post('/login', data=dict(
         shortname=shortname,
         password=password
@@ -164,10 +203,21 @@ def login(client, shortname, password):
 def logout(client):
     return client.get('/logout', follow_redirects=True)
 
-def register(client, shortname, nickname, password, password2):
+def register_user(client, shortname, nickname, password, password2):
     return client.post('/register', data=dict(
         shortname=shortname,
         nickname=nickname,
         password=password,
         password2=password2
     ), follow_redirects=True)
+
+def register_match(client, winners, losers, w_score, l_score, importance):
+    return client.post('/create_match',
+        data=dict(
+            winners=winners,
+            losers=losers,
+            winner_score=w_score,
+            loser_score=l_score,
+            importance=importance
+        ), follow_redirects=True
+    )
