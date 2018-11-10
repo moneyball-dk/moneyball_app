@@ -13,3 +13,4 @@ numpy
 pytest
 trueskill
 plotly
+pandas
