@@ -13,4 +13,7 @@ numpy
 pytest
 trueskill
 plotly
+<<<<<<< HEAD
 pandas
+=======
+>>>>>>> a2ebf4629e00bfe2d6afe8f3818471c2b1ae5cd7
