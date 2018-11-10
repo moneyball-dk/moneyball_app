@@ -32,6 +32,7 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash('Invalid shortname or password.')
             return redirect(url_for('login'))
+        flash(f'{user.shortname} successfully logged in')
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
@@ -43,6 +44,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+    flash(f'User logged out')
     return redirect(url_for('index'))
 
 
