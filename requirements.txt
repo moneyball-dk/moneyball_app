@@ -12,3 +12,4 @@ bokeh
 numpy
 pytest
 trueskill
+plotly

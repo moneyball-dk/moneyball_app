@@ -1,9 +1,4 @@
-#from bokeh.plotting import figure, ColumnDataSource
-#from bokeh.embed import components
-#from bokeh.models import HoverTool
-
 from app.models import User, Rating
-import cufflinks as cf
 import plotly
 import numpy as np
 import pandas as pd
