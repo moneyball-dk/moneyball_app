@@ -12,5 +12,5 @@ bokeh
 numpy
 pytest
 trueskill
-coverage
-pytest-cov
+plotly
+pandas
