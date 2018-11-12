@@ -1,10 +1,8 @@
-from bokeh.plotting import figure, ColumnDataSource
-from bokeh.embed import components
-from bokeh.models import HoverTool
-
 from app.models import User, Rating
-
+import plotly
 import numpy as np
+import pandas as pd
+import plotly.graph_objs as go
 
 def datetime(x):
     return np.array(x, dtype=np.datetime64)
@@ -18,27 +16,50 @@ def get_ratings(shortname, rating_type='elo'):
     values = [r.rating_value for r in ratings]
     dates = datetime([r.timestamp for r in ratings])
     match_ids = [r.match_id for r in ratings]
-    source = ColumnDataSource(data=dict(
+    source = pd.DataFrame(dict(
         date=dates,
         rating=values,
         match_id=match_ids
     ))
+
     return source
 
 def plot_ratings(shortname, rating_type):
     source = get_ratings(shortname, rating_type=rating_type)
-    p = figure(x_axis_type="datetime", tools="",)
-    p.line('date', 'rating', source=source)
+    hover_text = []
+    for index, row in source.iterrows():
+        hover_text.append((
+            "Match ID: {match_id}<br>"+
+            "Time: {date}<br>"+
+            "Rating: {rating}<br>").format(
+                match_id = format(row["match_id"], "1.0f") ,
+                date = row["date"].ctime(),
+                rating = format(row["rating"], "1.0f")
+            ))
+    
+    data = go.Scatter(
+            x = source.loc[:,"date"],
+            y = source.loc[:,"rating"],
+            text = hover_text,
+            hoverinfo = 'text',
+            marker = dict(
+                color = 'green'
+            ),
+            showlegend = False
+        )
+    data_comp = [data]
 
-    p.add_tools(HoverTool(
-        tooltips=[
-            ('match_id', '@match_id'),
-            ('rating', '@rating{0.2f}'),
-            ('date', '@date{%F}'),
-        ],
-        formatters={
-            'date':'datetime'
-        },
-        mode='vline',
+    layout_comp = go.Layout(
+        title='Performance over time',
+        hovermode='closest',
+        xaxis=dict(
+            title='Time',
+        ),
+        yaxis=dict(
+            title='Rating',
     ))
-    return p
+
+    fig_comp = go.Figure(data=data_comp, layout=layout_comp)
+    div = plotly.offline.plot(fig_comp, show_link=False, output_type="div", include_plotlyjs=False)
+
+    return div
