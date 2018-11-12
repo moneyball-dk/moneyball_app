@@ -73,7 +73,7 @@ def user(user_id):
     #b_script, b_div = components(plot)
 
     return render_template('user.html', user=user, matches=user.matches, 
-        b_div=b_div. title='User')
+        b_div=b_div, title='User')
 
 
 @app.route('/match/<match_id>')
