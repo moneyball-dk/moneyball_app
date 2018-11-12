@@ -30,9 +30,13 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different nickname')
 
+def my_check_scores(form, field):
+    if form.winner_score.data <= form.loser_score.data:
+        raise ValidationError('Winning score must be greater than losing score')
+    
 class CreateMatchForm(FlaskForm):
-    winner_score = IntegerField('Winning Score', validators=[Optional()])
-    loser_score = IntegerField('Losing Score', validators=[Optional()])
+    winner_score = IntegerField('Winning Score', validators=[my_check_scores])
+    loser_score = IntegerField('Losing Score', validators=[my_check_scores])
     winners = QuerySelectMultipleField(
         'Winners', 
         validators=[DataRequired()],
@@ -56,26 +60,22 @@ class CreateMatchForm(FlaskForm):
             if l in self.winners.data:
                 raise ValidationError('Same user cannot be both winner and loser')
 
-    def validate_loser_score(self, loser_score):
-        if self.winner_score.data <= loser_score.data:
-            raise ValidationError('Winning score must be greater than losing score')
-
 
 class EditUserForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
     nickname = StringField('Nickname', validators=[DataRequired()])
-    #password = PasswordField('Password', validators=[DataRequired()])
-    #password2 = PasswordField(
-    #    'Repeat password', validators=[DataRequired(), EqualTo('password')]
-    #    )
     submit = SubmitField('Submit')
 
 
 class EditPasswordForm(FlaskForm):
-    #shortname = StringField('Shortname', validators=[DataRequired()])
-    #nickname = StringField('Nickname', validators=[DataRequired()])
     password = PasswordField('New password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat new password', validators=[DataRequired(), EqualTo('password')]
         )
+    submit = SubmitField('Submit')
+
+class ChooseLeaderboardSorting(FlaskForm):
+    sorting =SelectField('Sorting', 
+        choices=[('elo', 'Elo'), ('trueskill', 'Trueskill')],
+        default='elo')
     submit = SubmitField('Submit')

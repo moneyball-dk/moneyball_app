@@ -11,4 +11,8 @@ psycopg2
 bokeh
 numpy
 pytest
+coverage
+pytest-cov
 trueskill
+plotly
+pandas
