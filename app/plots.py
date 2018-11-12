@@ -28,11 +28,15 @@ def plot_ratings(shortname, rating_type):
     source = get_ratings(shortname, rating_type=rating_type)
     hover_text = []
     for index, row in source.iterrows():
+        match_id = row['match_id']
+        if pd.isnull(match_id):
+            # To allow formatting of ids laters
+            match_id = 0
         hover_text.append((
             "Match ID: {match_id}<br>"+
             "Time: {date}<br>"+
             "Rating: {rating}<br>").format(
-                match_id = format(row["match_id"], "1.0f") ,
+                match_id = format(match_id, "1.0f") ,
                 date = row["date"].ctime(),
                 rating = format(row["rating"], "1.0f")
             ))
