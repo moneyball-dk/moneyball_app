@@ -26,8 +26,8 @@ def get_ratings(shortname, rating_type='elo'):
 
 def plot_ratings(shortname, rating_type):
     source = get_ratings(shortname, rating_type=rating_type)
-
-    if len(source)<7:
+    const = 7
+    if len(source)<const:
         hover_text = []
         for index, row in source.iterrows():
             match_id = row['match_id']
@@ -53,19 +53,10 @@ def plot_ratings(shortname, rating_type):
                 ),
                 showlegend = False
             )
-        data_comp = [data]
-        layout_comp = go.Layout(
-            title='Performance over time',
-            hovermode='closest',
-            xaxis=dict(
-                title='Time',
-            ),
-            yaxis=dict(
-                title='Rating',
-        ))
-        fig_comp = go.Figure(data=data_comp, layout=layout_comp)
-        div = plotly.offline.plot(fig_comp, show_link=False, output_type="div", include_plotlyjs=False)
     else:
+        # (1) Resample source dataframe so that there is one entry for every resample interval.
+        # (2) Convert the source dataframe to a dataframe with four columns: open, high, low, close.
+        # (3) Fill in empty rows.
         resample_interval = "D"
         series = source.set_index("date").loc[:,"rating"]
         df_new = series.resample(resample_interval).last()
@@ -105,16 +96,16 @@ def plot_ratings(shortname, rating_type):
                     #decreasing=dict(line=dict(color= '#7F7F7F')),
                         )
 
-        data_comp = [data]
-        layout_comp = go.Layout(
-            title='Performance over time',
-            #hovermode='closest',
-            xaxis=dict(
-                title='Time',
-            ),
-            yaxis=dict(
-                title='Rating',
-        ))
-        fig_comp = go.Figure(data=data_comp, layout=layout_comp)
-        div = plotly.offline.plot(fig_comp, show_link=False, output_type="div", include_plotlyjs=False)
+    data_comp = [data]
+    layout_comp = go.Layout(
+        title='Performance over time',
+        #hovermode='closest',
+        xaxis=dict(
+            title='Time',
+        ),
+        yaxis=dict(
+            title='Rating',
+    ))
+    fig_comp = go.Figure(data=data_comp, layout=layout_comp)
+    div = plotly.offline.plot(fig_comp, show_link=False, output_type="div", include_plotlyjs=False)
     return div
