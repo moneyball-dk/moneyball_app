@@ -71,6 +71,17 @@ class User(UserMixin, db.Model):
             return (mu.rating_value, sigma.rating_value)
         except AttributeError:
             return (25, 8.33)
+
+    def get_current_goal_difference(self):
+        rating = Rating.query \
+            .filter(and_(Rating.user_id == self.id), Rating.rating_type == 'goal_difference') \
+            .order_by(Rating.timestamp.desc()) \
+            .first()
+        try:
+            return rating.rating_value
+        except AttributeError:
+            return 0
+
     
     def get_match_rating_value(self, match, rating_type='elo'):
         rating = Rating.query \
@@ -89,6 +100,8 @@ class User(UserMixin, db.Model):
             rating = mu - (3*sigma)
         elif rating_type == 'elo':
             rating = self.get_current_elo()
+        elif rating_type == 'goal_difference':
+            rating = self.get_current_goal_difference()
         else: raise AssertionError(f'wrong rating_type: {rating_type}')
         return rating
 

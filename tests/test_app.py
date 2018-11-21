@@ -136,6 +136,14 @@ def test_user_page(test_client, filled_db):
 
     # TODO: Is there any way to test plotting functions
 
+def test_plot_candlestick(test_client, many_matches_db):
+    # Just checking we are not crashing when running candlestick part of the plotting code
+    response = test_client.get('/user/1')
+    assert response.status_code == 200
+    assert b'User' in response.data
+    assert b'UserID: 1' in response.data
+
+
 def test_match_page(test_client, filled_db):
     # Test match page when not logged in 
     response = test_client.get('/match/1')
@@ -221,3 +229,4 @@ def register_match(client, winners, losers, w_score, l_score, importance):
             importance=importance
         ), follow_redirects=True
     )
+
