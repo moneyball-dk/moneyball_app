@@ -44,3 +44,20 @@ def filled_db(empty_db):
     yield empty_db
     empty_db.session.remove()
     empty_db.drop_all()
+
+
+@pytest.fixture(scope='function')
+def many_matches_db(filled_db):
+    from app.models import User
+    from app.tasks import make_new_match, approve_match
+    u1, u2 =  User.query.all()
+
+    matches = [make_new_match(
+        winners=[u1], losers=[u2], w_score=1, l_score=0, importance=16, user_creating_match=u1
+    ) for i in range(20)]
+    for m in matches:
+        approve_match(m, u2)
+
+    yield filled_db
+    filled_db.session.remove()
+    filled_db.drop_all()
