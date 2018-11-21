@@ -75,7 +75,10 @@ class EditPasswordForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class ChooseLeaderboardSorting(FlaskForm):
-    sorting =SelectField('Sorting', 
-        choices=[('elo', 'Elo'), ('trueskill', 'Trueskill')],
+    sorting = SelectField('Sorting', 
+        choices=[
+            ('elo', 'Elo'), 
+            ('trueskill', 'Trueskill'),
+            ('goal_difference', 'Goal difference')],
         default='elo')
     submit = SubmitField('Submit')

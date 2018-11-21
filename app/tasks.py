@@ -30,6 +30,8 @@ def init_ratings(user, timestamp=None):
         rating_value=25, timestamp=timestamp)
     r_ts_s = Rating(user=user, rating_type='trueskill_sigma', 
         rating_value=8.333, timestamp=timestamp)
+    r_gd = Rating(user=user, rating_type='goal_difference',
+        rating_value=0, timestamp=timestamp)
     db.session.add_all([r_elo, r_ts_m, r_ts_s])
     db.session.commit()
 
@@ -67,6 +69,7 @@ def update_match_ratings(match):
         return False
     update_trueskill_by_match(match)
     update_elo_by_match(match)
+    update_goal_difference_by_match(match)
 
 def update_elo_by_match(match):
     elo_change = get_match_elo_change(match)
@@ -81,6 +84,20 @@ def update_elo_by_match(match):
         timestamp=match.timestamp)
         db.session.add(r)
     db.session.commit()
+
+def get_match_elo_change(match):
+    Qs = []
+    # First, get all winning players, then all losing players
+    for players in [match.winning_players, match.losing_players]:
+        # Get the avg elo for each team seperately
+        elos = [p.get_current_elo() for p in players]
+        avg_elo = sum(elos) / len(elos)
+        Q = 10 ** (avg_elo / 400)
+        Qs.append(Q)
+    Q_w, Q_l = Qs
+    exp_win = Q_w / (Q_w + Q_l)
+    change_w = match.importance * (1 - exp_win)
+    return change_w
 
 def update_trueskill_by_match(match):
     w_ratings = []
@@ -115,19 +132,20 @@ def update_trueskill_by_match(match):
         db.session.add_all([r_m, r_s])
         db.session.commit()
 
-def get_match_elo_change(match):
-    Qs = []
-    # First, get all winning players, then all losing players
-    for players in [match.winning_players, match.losing_players]:
-        # Get the avg elo for each team seperately
-        elos = [p.get_current_elo() for p in players]
-        avg_elo = sum(elos) / len(elos)
-        Q = 10 ** (avg_elo / 400)
-        Qs.append(Q)
-    Q_w, Q_l = Qs
-    exp_win = Q_w / (Q_w + Q_l)
-    change_w = match.importance * (1 - exp_win)
-    return change_w
+def update_goal_difference_by_match(match):
+    diff = match.winner_score - match.loser_score
+
+    for p in match.winning_players:
+        current_gd = p.get_current_goal_difference()
+        r = Rating(user=p, match=match, timestamp=match.timestamp, 
+            rating_type='goal_difference', rating_value=current_gd + diff)
+        db.session.add(r)
+    for p in match.losing_players:
+        current_gd = p.get_current_goal_difference()
+        r = Rating(user=p, match=match, timestamp=match.timestamp, 
+            rating_type='goal_difference', rating_value=current_gd - diff)
+        db.session.add(r)
+    db.session.commit()
 
 def approve_match(match, approver):
     if approver in match.winning_players:
