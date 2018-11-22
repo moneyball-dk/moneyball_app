@@ -171,9 +171,9 @@ def route_edit_password():
     return render_template('edit_user_password.html', title='Moneyball', form=form)
 
 #@app.route('/edit_user_password', methods=['GET', 'POST'])
-@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
+@app.route('/user/<user_id>/edit_password', methods=['GET', 'POST'])
 @login_required
-def route_edit_password(user_id):
+def route_edit_other_password(user_id):
     form = EditPasswordForm()
     #user = current_user
     user = User.query.filter_by(id=user_id).first_or_404()
