@@ -170,23 +170,6 @@ def route_edit_password():
         return redirect(url_for('user', user_id=user.id))
     return render_template('edit_user_password.html', title='Moneyball', form=form)
 
-#@app.route('/edit_user_password', methods=['GET', 'POST'])
-@app.route('/user/<user_id>/edit_password', methods=['GET', 'POST'])
-@login_required
-def route_edit_other_password(user_id):
-    form = EditPasswordForm()
-    #user = current_user
-    user = User.query.filter_by(id=user_id).first_or_404()
-    if form.validate_on_submit():
-        tasks.update_password(
-            user=user,
-            password=form.password.data,
-        )
-        flash(f'Password of user {user} updated')
-        return redirect(url_for('user', user_id=user.id))
-    return render_template('edit_user_password.html', title='Moneyball', form=form)
-
-
 @app.route('/match/<match_id>/approve', methods=['POST'])
 @login_required
 def route_approve_match(match_id):
