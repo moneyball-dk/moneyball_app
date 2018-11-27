@@ -170,7 +170,6 @@ def route_edit_password():
         return redirect(url_for('user', user_id=user.id))
     return render_template('edit_user_password.html', title='Moneyball', form=form)
 
-
 @app.route('/match/<match_id>/approve', methods=['POST'])
 @login_required
 def route_approve_match(match_id):
