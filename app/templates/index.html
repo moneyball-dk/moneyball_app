@@ -3,17 +3,14 @@
 
 {% block app_content %} 
   {% if current_user.is_anonymous %}
-
     <div class="jumbotron">
     <h1>Moneyball</h1>
     <p>
     Using state-of-the-art machine learning techniques, we can reveal what aspects of your performance stand out from the competition. 
     </p>
-
     <p>
-    Leverage your innate talent, fullfill your potential and truely perform at the highest level - with moneyball.
+    Leverage your innate talent, fullfill your potential and truely perform at the highest level - with Moneyball.
     </p>
-
     <p>
     Track your progress over time and deep-dive on old results. 
     </p>
@@ -24,10 +21,74 @@
       <div class="form-group">
         <label for="exampleInputEmail1">Enter your email to be notified when we go live</label>
         <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else - we don't even record it here!</small>
         </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+  </div>
+
+    
+  <!-- Testimonial  -->
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-center m-auto">
+          <h2>Testimonials</h2>
+          <div id="myCarousel" class="carousel slide" data-ride="carousel">
+            <!-- Carousel indicators -->
+            <ol class="carousel-indicators">
+              <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+              <li data-target="#myCarousel" data-slide-to="1"></li>
+              <li data-target="#myCarousel" data-slide-to="2"></li>
+            </ol>   
+            <!-- Wrapper for carousel items -->
+            <div class="carousel-inner">
+              <div class="item carousel-item active">
+                <div class="img-box"><img src="{{ url_for('static', filename='1.jpg') }}" alt=""></div>
+                <p class="testimonial">Moneyball has been immensely helpful in helping me to attain personal peace. 
+                  The Moneyball website will help me to continue to exercise my creativity at work, while also striving 
+                  to achieve personal freedom for my goals in life outside of work. Thank you for the inspiration!</p>
+                <p class="overview"><b>Paula Wilson</b>, Full Valuechain Provider</p>
+              </div>
+              <div class="item carousel-item">
+                <div class="img-box"><img src="{{ url_for('static', filename='3.jpeg') }}" alt=""></div>
+                <p class="testimonial">Approximately 5 days ago I met Optimus Primdal, owner of Moneyball 
+                  and was immediately drawn to his energy and strength and soon discovered that Moneyball 
+                  was a powerful energy source that I wanted to incorporate into my daily regiment by logging a couple of games on the regular.</p>
+                <p class="overview"><b>Antonio Moreno</b>, Top Hackerman</p>
+              </div>
+              <div class="item carousel-item">
+                <div class="img-box"><img src="{{ url_for('static', filename='2.jpg') }}" alt=""></div>
+                <p class="testimonial">I was murdered on Moneyball. Highly recommended!</p>
+                <p class="overview"><b>Michael Holz</b>, Flagellant</p>
+              </div>
+              <!-- A few months ago I developed eczema all over my body, which was very itchy and burning. 
+                The dermatologist prescribed cortisone cream. I did not want to use this because it thins the skin.
+                I needed something that could help cleanse my entire body – so I created an account on Moneyball!
+                  Of course I did a colon cleanse as well - but my skin seemed to almost magically respond to logging games on Moneyball.  -->
+            </div>
+            <!-- Carousel controls -->
+            <a class="carousel-control left carousel-control-prev" href="#myCarousel" data-slide="prev">
+              <i class="fa fa-angle-left"></i>
+            </a>
+            <a class="carousel-control right carousel-control-next" href="#myCarousel" data-slide="next">
+              <i class="fa fa-angle-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
   {% else %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
