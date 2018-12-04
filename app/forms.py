@@ -34,18 +34,27 @@ def my_check_scores(form, field):
     if form.winner_score.data <= form.loser_score.data:
         raise ValidationError('Winning score must be greater than losing score')
     
+def sort_players():
+    return sorted(
+        [u for u in User.query.all()], 
+        key=lambda x: (
+            x.get_recent_match_timestamp(),
+            x.shortname),
+        reverse=True
+        )
+
 class CreateMatchForm(FlaskForm):
     winner_score = IntegerField('Winning Score', validators=[my_check_scores])
     loser_score = IntegerField('Losing Score', validators=[my_check_scores])
     winners = QuerySelectMultipleField(
         'Winners', 
         validators=[DataRequired()],
-        query_factory = lambda: User.query,
+        query_factory = sort_players,
           )
     losers = QuerySelectMultipleField(
         'Losers', 
         validators=[DataRequired()],
-        query_factory = lambda: User.query,
+        query_factory = sort_players,
           )
 
     importance = SelectField('Match Importance',
