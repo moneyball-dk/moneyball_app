@@ -125,12 +125,15 @@ def route_delete_match(match_id):
     return redirect(url_for('index'))
 
 @app.route('/edit_user', methods=['GET', 'POST'])
-#@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 @login_required
 def route_edit_user():
+    user_id = current_user.id
+    return route_edit_other_user(user_id)
+
+@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
+def route_edit_other_user(user_id):
     form = EditUserForm()
-    user = current_user
-    #user = User.query.filter_by(id=user_id).first_or_404()
+    user = User.query.filter_by(id=user_id).first_or_404()
     if form.validate_on_submit():
         shortname = form.shortname.data.upper()
         sn_user = User.query.filter_by(shortname=shortname).first()
@@ -145,7 +148,6 @@ def route_edit_user():
             user=user,
             shortname=shortname,
             nickname=form.nickname.data,
-            #password=form.password.data,
         )
         flash(f'User {user} updated')
         return redirect(url_for('user', user_id=user.id))
@@ -153,6 +155,7 @@ def route_edit_user():
         form.shortname.data = user.shortname
         form.nickname.data = user.nickname
     return render_template('edit_user.html', title='Edit User', form=form)
+
 
 @app.route('/edit_user_password', methods=['GET', 'POST'])
 #@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
