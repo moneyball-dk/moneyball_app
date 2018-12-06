@@ -192,3 +192,7 @@ def route_approval_pending(user_id):
             matches_pending_user_approval.append(m)
 
     return render_template('approval_pending.html', matches=matches_pending_user_approval)
+
+@app.route('/rules')
+def rules():
+    return render_template('rules.html')
