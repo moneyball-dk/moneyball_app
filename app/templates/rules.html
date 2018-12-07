@@ -1,33 +1,61 @@
 {% extends "base.html" %}
 
 {% block app_content %} 
-   Agreeing on the game:
-All players must agree on the table being played on before the match.
-All players must agree on the ball type to be used before the match.
-All players must agree on the importance of the match (weight) before the match.
-All players must agree on the amount of goals scored to win the match, before the match.
-*For the highest match importance (weight = 32), games need to be played to 10 goals minimum.
-Note: All games are assumed to be of the Gentleman’s Game type (Ref. below) – unless any objections are put forth verbally before the match commences.
+   <h3>Agreeing on the game:</h3>
+   <ul>
+       <li>All players must agree on the table being played on before the match. </li>
+       <li>All players must agree on the ball type to be used before the match. </li>
+       <li>All players must agree on the importance of the match (weight) before the match.</li>
+       <li>All players must agree on the amount of goals scored to win the match, before the match.</li>
+   </ul>
+    NB: For the highest match importance (weight = 32), games need to be played to 10 goals minimum. <br>
+    NB: All games are assumed to be of the Gentleman’s Game type (Ref. below) – unless any objections are put forth verbally before the match commences.
 
-Game Types:
-There are two overarching game types:
-A. The Gentleman’s Game: A gentleman’s game is a game of skill, endurance and high spirits; for this reason, it is naturally not allowed to score any goals directly from the midfield; as this, for all intents and purposes, is considered the most shameful move in the game, as it is in life itself.
-B. The Game for Savages: A game for savages, wilder beasts and generally uncultured swine, is a game dominated by aggression, moronic levels of IQ and exceptionally low skill. In these games, it is necessary to break the cardinal rule of foosball, and to allow for goals to be scored from the midfield. For this reason, the outcomes of these types of games are not to be seen as a true reflection of skill; nor to be likened to a proper Gentleman’s Game; and hence one ought to be morally bound to abstain from logging matches of this type in the Moneyball ecosystem.
+<h3>Game Types:</h3>
+    There are two overarching game types:
+    <ol>
+        <li>
+            The Gentleman’s Game: A gentleman’s game is a game of skill, 
+            endurance and high spirits; for this reason, it is naturally not 
+            allowed to score any goals directly from the midfield; as this, 
+            for all intents and purposes, is considered the most shameful move 
+            in the game, as it is in life itself. 
+        </li>
+        <li>
+            The Game for Savages: A game for savages, wilder beasts and generally uncultured 
+            swine, is a game dominated by aggression, moronic levels of IQ and exceptionally
+             low skill. In these games, it is necessary to break the cardinal rule of foosball, 
+             and to allow for goals to be scored from the midfield. For this reason, the outcomes 
+             of these types of games are not to be seen as a true reflection of skill; nor 
+             to be likened to a proper Gentleman’s Game; and hence one ought to be morally 
+             bound to abstain from logging matches of this type in the Moneyball ecosystem. 
+        </li>
+    </ol>
 
-Beginning the game:
-Either 1) a coin toss determines which team gets to place the ball at the feet of their midfielders. The ball must be touched 3 times by the midfielders, to be 'in play', or 2) the ball is seeded through the hole in the table.
-When someone scores:
+<h3>Beginning the game:</h3>
+Either
+<ol>
+    <li>
+        A coin toss determines which team gets to place the ball at the feet of their midfielders. The ball must be touched 3 times by the midfielders, to be 'in play'.
+    </li>
+    or
+    <li>
+        The ball is seeded through the hole in the table.
+    </li>
+</ol>
+
+<h3>When someone scores:</h3>
 The team that was scored against gets to place the ball at the feet of their midfielders. The ball must be touched 3 times by the midfielders, to be 'in play'.
 
-Spinning:
+<h3>Spinning: </h3>
 It is allowed to spin 360*, before contact is made with the ball. In case of obvious double-spins, the penalty is 30 seconds playtime with one hand only (or until next goal -> whichever comes first).
 
-Decreeing a challenge:
+<h3>Decreeing a challenge: </h3>
 A challenge can be decreed, by verbally slapping thine preferred opponent across the face.
 From the time of contact between thine words, and thine opponent’s ears, a countdown of 2 hours commences. Within these two hours, an agreement on the practicalities of the challenge need to be settled (Time/Table/Ball/Weight/Goals/Type).
 If a team/player fails to show up for a specific challenge, the other party wins 3-0 by default (Game Weight=8).
 
-When is it a valid Goal:
+<h3>When is it a valid Goal:  </h3>
 As soon as the ball has passed the goal line, a goal is scored. In the event where the ball bounces out of the goal again, the goal is still counted.
 
 {% endblock %}
