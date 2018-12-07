@@ -196,3 +196,12 @@ def route_approval_pending(user_id):
 @app.route('/rules')
 def rules():
     return render_template('rules.html')
+  
+@app.route('/.well-known/change-password')
+def route_well_known_change_password():
+    """
+    Redirect to change password page. 
+    See https://github.com/WICG/change-password-url/blob/gh-pages/explainer.md
+    """
+    return redirect(url_for('route_edit_password'))
+
