@@ -113,14 +113,6 @@ class User(UserMixin, db.Model):
         else:
             return False
         
-    def get_recent_match_timestamp(self):
-        sorted_matches = sorted(self.matches, key=lambda x: x.timestamp, reverse=True)
-        try:
-            most_recent_match = sorted_matches[0]
-            return most_recent_match.timestamp
-        except IndexError:
-            # If no matches played, return current time
-            return datetime.now()
 
 @login.user_loader
 def load_user(id):
