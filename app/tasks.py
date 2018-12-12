@@ -159,7 +159,7 @@ def approve_match(match, approver):
     recalculate_ratings()
     return 'Match approved'
 
-def make_new_match(winners, losers, w_score, l_score, importance, 
+def make_new_match(timestamp, winners, losers, w_score, l_score, importance, 
     user_creating_match=None):
     approved_winner, approved_loser = False, False
     if user_creating_match in winners:
@@ -167,6 +167,7 @@ def make_new_match(winners, losers, w_score, l_score, importance,
     elif user_creating_match in losers:
         approved_loser = True
     match = Match(
+        timestamp = timestamp,
         winner_score=w_score, 
         loser_score=l_score,
         importance=importance,

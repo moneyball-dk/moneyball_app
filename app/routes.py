@@ -94,6 +94,7 @@ def create_match():
             flash('Logged in user should be playing in match')
             return redirect(url_for('create_match'))
         match = tasks.make_new_match(
+            timestamp=form.timestamp.data,
             winners=form.winners.data,
             losers=form.losers.data,
             w_score=form.winner_score.data,
