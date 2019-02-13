@@ -123,6 +123,16 @@ class User(UserMixin, db.Model):
             # If no matches played, return current time
             return datetime.now()
 
+    def get_winstreak(self):
+        winstreak = 0
+        # TODO: Make sure this is looping from newest to oldest.
+        for m in self.matches[::-1]:
+            if self in m.winning_players:
+                winstreak += 1
+            else:
+                break
+        return winstreak
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

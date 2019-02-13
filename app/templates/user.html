@@ -32,8 +32,8 @@
     {% else %}
         {% set winrate = (user.won_matches|length / denom * 100)|round %}
     {% endif %}
-    Winrate: {{ winrate }} %
-
+    Winrate: {{ winrate }} % <br>
+    Winstreak: {{ user.get_winstreak()|int }}
 {{ b_div|safe }}
 
 {% endblock %}
