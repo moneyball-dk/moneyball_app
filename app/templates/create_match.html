@@ -6,8 +6,6 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
 
-        <d1> {{render_field(form.timestamp)}} </d1>
-
         <d1> {{render_field(form.importance)}} </d1>
         <h2>Winners</h1>
 
@@ -19,6 +17,7 @@
         <d1> {{render_field(form.loser_score, size=2)}} </d1>
         <d1> {{render_field(form.losers)}} </d1>
 
+        <d1> {{render_field(form.timestamp)}} </d1>
 
         <p>{{ form.submit() }}</p>
     </form>

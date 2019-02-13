@@ -34,10 +34,10 @@ class RegistrationForm(FlaskForm):
 def my_check_scores(form, field):
     if form.winner_score.data <= form.loser_score.data:
         raise ValidationError('Winning score must be greater than losing score')
-    
+
 def sort_players():
     return sorted(
-        [u for u in User.query.all()], 
+        [u for u in User.query.all()],
         key=lambda x: (
             x.get_recent_match_timestamp(),
             x.shortname),
@@ -45,23 +45,23 @@ def sort_players():
         )
 
 class CreateMatchForm(FlaskForm):
-    timestamp = DateTimeField("Match played at", default=datetime.datetime.now())
+    timestamp = DateTimeField("Match played at", default=datetime.datetime.now)
     winner_score = IntegerField('Winning Score', validators=[my_check_scores])
     loser_score = IntegerField('Losing Score', validators=[my_check_scores])
     winners = QuerySelectMultipleField(
-        'Winners', 
+        'Winners',
         validators=[DataRequired()],
         query_factory = sort_players,
           )
     losers = QuerySelectMultipleField(
-        'Losers', 
+        'Losers',
         validators=[DataRequired()],
         query_factory = sort_players,
           )
 
     importance = SelectField('Match Importance',
-        choices=[(k, k) for k in [8, 16, 32]], 
-        coerce=int, 
+        choices=[(k, k) for k in [8, 16, 32]],
+        coerce=int,
         default=16)
     submit = SubmitField('Submit')
 
@@ -86,9 +86,9 @@ class EditPasswordForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class ChooseLeaderboardSorting(FlaskForm):
-    sorting = SelectField('Sorting', 
+    sorting = SelectField('Sorting',
         choices=[
-            ('elo', 'Elo'), 
+            ('elo', 'Elo'),
             ('trueskill', 'Trueskill'),
             ('goal_difference', 'Goal difference')],
         default='elo')

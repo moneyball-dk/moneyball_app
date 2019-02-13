@@ -10,7 +10,7 @@ def create_user(shortname, nickname, password):
         raise AssertionError('Someone has already used that shortname')
     if nn_user is not None:
         raise AssertionError('Someone has already used that nickname')
-    
+
     user = User(
         shortname=shortname.upper(),
         nickname=nickname
@@ -24,29 +24,33 @@ def create_user(shortname, nickname, password):
 def init_ratings(user, timestamp=None):
     if timestamp is None:
         timestamp = datetime.now()
-    r_elo = Rating(user=user, rating_type='elo', rating_value=1500, 
+    r_elo = Rating(user=user, rating_type='elo', rating_value=1500,
         timestamp=timestamp)
-    r_ts_m = Rating(user=user, rating_type='trueskill_mu', 
+    r_ts_m = Rating(user=user, rating_type='trueskill_mu',
         rating_value=25, timestamp=timestamp)
-    r_ts_s = Rating(user=user, rating_type='trueskill_sigma', 
+    r_ts_s = Rating(user=user, rating_type='trueskill_sigma',
         rating_value=8.333, timestamp=timestamp)
     r_gd = Rating(user=user, rating_type='goal_difference',
         rating_value=0, timestamp=timestamp)
     db.session.add_all([r_elo, r_ts_m, r_ts_s])
     db.session.commit()
 
-def recalculate_ratings():
+def recalculate_ratings(after_time=None):
+    if after_time is None:
+        # Set first datetime to earliest possible time
+        after_time = datetime.min
     users = User.query.all()
     timestamps = []
     for u in users:
         # Get the first timestamp on Rating for each User
-        # To initialize first Rating at earliest record of the user. 
+        # To initialize first Rating at earliest record of the user.
         timestamps.append(Rating.query \
             .filter(Rating.user_id == u.id) \
             .filter(Rating.rating_type == 'elo') \
             .order_by(Rating.timestamp) \
             .first().timestamp )
-    db.session.query(Rating).delete()
+    Rating.query.delete()
+    #db.session.query(Rating).delete()
     db.session.commit()
     for u, t in zip(users, timestamps):
         init_ratings(u, t)
@@ -74,7 +78,7 @@ def update_match_ratings(match):
 def update_elo_by_match(match):
     elo_change = get_match_elo_change(match)
     for p in match.winning_players:
-        r = Rating(user=p, match=match, rating_type='elo', 
+        r = Rating(user=p, match=match, rating_type='elo',
         rating_value=p.get_current_elo() + elo_change,
         timestamp=match.timestamp)
         db.session.add(r)
@@ -137,12 +141,12 @@ def update_goal_difference_by_match(match):
 
     for p in match.winning_players:
         current_gd = p.get_current_goal_difference()
-        r = Rating(user=p, match=match, timestamp=match.timestamp, 
+        r = Rating(user=p, match=match, timestamp=match.timestamp,
             rating_type='goal_difference', rating_value=current_gd + diff)
         db.session.add(r)
     for p in match.losing_players:
         current_gd = p.get_current_goal_difference()
-        r = Rating(user=p, match=match, timestamp=match.timestamp, 
+        r = Rating(user=p, match=match, timestamp=match.timestamp,
             rating_type='goal_difference', rating_value=current_gd - diff)
         db.session.add(r)
     db.session.commit()
@@ -156,10 +160,10 @@ def approve_match(match, approver):
         # User not playing
         return 'Cant approve match. You are not a player in this match'
     db.session.commit()
-    recalculate_ratings()
+    recalculate_ratings(after_time=match.timestamp)
     return 'Match approved'
 
-def make_new_match(winners, losers, w_score, l_score, importance, 
+def make_new_match(winners, losers, w_score, l_score, importance,
     user_creating_match=None, timestamp=None):
     if timestamp is None:
         timestamp = datetime.now()
@@ -170,7 +174,7 @@ def make_new_match(winners, losers, w_score, l_score, importance,
         approved_loser = True
     match = Match(
         timestamp = timestamp,
-        winner_score=w_score, 
+        winner_score=w_score,
         loser_score=l_score,
         importance=importance,
         approved_winner=approved_winner,
@@ -181,17 +185,17 @@ def make_new_match(winners, losers, w_score, l_score, importance,
     for w in winners:
         user_match = UserMatch(
             user=w,
-            match=match, 
+            match=match,
             win=True)
         db.session.add(user_match)
     for l in losers:
         user_match = UserMatch(
             user=l,
-            match=match, 
+            match=match,
             win=False)
         db.session.add(user_match)
     db.session.flush()
-    
+
     update_match_ratings(match)
     db.session.commit()
     return match
