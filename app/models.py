@@ -112,7 +112,11 @@ class User(UserMixin, db.Model):
             return True
         else:
             return False
-        
+
+    def can_delete_match(self, match):
+        if self in match.players: return True
+        else: return False
+
     def get_recent_match_timestamp(self):
         sorted_matches = sorted(self.matches, key=lambda x: x.timestamp, reverse=True)
         try:
