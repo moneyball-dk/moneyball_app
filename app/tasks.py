@@ -60,7 +60,7 @@ def recalculate_ratings(after_time=None):
     matches = Match.query \
         .filter(Match.approved_winner == True) \
         .filter(Match.approved_loser == True) \
-        .filter(Match.timestamp >= after_time)
+        .filter(Match.timestamp >= after_time) \
         .order_by(Match.timestamp).all()
     for match in matches:
         update_match_ratings(match)
