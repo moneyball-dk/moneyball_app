@@ -4,7 +4,12 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.validators import DataRequired, ValidationError, EqualTo, Optional
 from wtforms.ext.dateutil.fields import DateTimeField
 from app.models import User
-import datetime
+from datetime import datetime
+from dateutil.tz import gettz
+from functools import partial
+
+tz = gettz('Europe/Copenhagen')
+
 
 class LoginForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
@@ -43,9 +48,11 @@ def sort_players():
             x.shortname),
         reverse=True
         )
+def copenhagen_now():
+    return partial(datetime.now, tz=tz)
 
 class CreateMatchForm(FlaskForm):
-    timestamp = DateTimeField("Match played at", default=datetime.datetime.now)
+    timestamp = DateTimeField("Match played at", default=copenhagen_now)
     winner_score = IntegerField('Winning Score', validators=[my_check_scores])
     loser_score = IntegerField('Losing Score', validators=[my_check_scores])
     winners = QuerySelectMultipleField(

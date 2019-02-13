@@ -1,8 +1,12 @@
 from app import db, login
-from datetime import datetime
 from sqlalchemy import or_, and_
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from datetime import datetime
+from dateutil.tz import gettz
+from functools import partial
+
+tz = gettz('Europe/Copenhagen')
 
 
 class User(UserMixin, db.Model):
@@ -149,12 +153,15 @@ class UserMatch(db.Model):
     user = db.relationship('User', foreign_keys=user_id)
     match = db.relationship('Match', foreign_keys=match_id )
 
+def copenhagen_now():
+    return partial(datetime.now, tz=tz)
+
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     winner_score = db.Column(db.Integer)
     loser_score = db.Column(db.Integer)
     importance = db.Column(db.Integer, default=16)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
+    timestamp = db.Column(db.DateTime, index=True, default=copenhagen_now)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'))
     ratings = db.relationship('Rating')
     approved_winner = db.Column(db.Boolean, default=False)
@@ -167,7 +174,7 @@ class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
+    timestamp = db.Column(db.DateTime, index=True, default=copenhagen_now)
     rating_type = db.Column(db.String(64), index=True)
     rating_value = db.Column(db.Float)
 
