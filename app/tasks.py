@@ -49,15 +49,18 @@ def recalculate_ratings(after_time=None):
             .filter(Rating.rating_type == 'elo') \
             .order_by(Rating.timestamp) \
             .first().timestamp )
-    Rating.query.delete()
+    Rating.query.filter(Rating.timestamp >= after_time).delete()
     #db.session.query(Rating).delete()
     db.session.commit()
     for u, t in zip(users, timestamps):
-        init_ratings(u, t)
+        # If user is created after `after_time`, reinit that users ratings.
+        if t >= after_time:
+            init_ratings(u, t)
 
     matches = Match.query \
         .filter(Match.approved_winner == True) \
         .filter(Match.approved_loser == True) \
+        .filter(Match.timestamp >= after_time)
         .order_by(Match.timestamp).all()
     for match in matches:
         update_match_ratings(match)
