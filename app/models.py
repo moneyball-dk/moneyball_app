@@ -10,9 +10,9 @@ class User(UserMixin, db.Model):
     shortname = db.Column(db.String(64), index=True, unique=True)
     nickname = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    matches = db.relationship('Match', 
+    matches = db.relationship('Match',
         order_by="Match.timestamp",
-        secondary='user_match', 
+        secondary='user_match',
         primaryjoin="user_match.c.user_id == user.c.id",
         backref=db.backref('players', lazy=True)
     )
@@ -57,13 +57,13 @@ class User(UserMixin, db.Model):
     def get_current_trueskill(self):
         mu = Rating.query \
             .filter(and_(
-                Rating.user_id == self.id), 
+                Rating.user_id == self.id),
                 Rating.rating_type == 'trueskill_mu') \
             .order_by(Rating.timestamp.desc()) \
             .first()
         sigma = Rating.query \
             .filter(and_(
-                Rating.user_id == self.id), 
+                Rating.user_id == self.id),
                 Rating.rating_type == 'trueskill_sigma') \
             .order_by(Rating.timestamp.desc()) \
             .first()
@@ -82,7 +82,7 @@ class User(UserMixin, db.Model):
         except AttributeError:
             return 0
 
-    
+
     def get_match_rating_value(self, match, rating_type='elo'):
         rating = Rating.query \
             .filter(Rating.user_id == self.id) \
@@ -102,7 +102,8 @@ class User(UserMixin, db.Model):
             rating = self.get_current_elo()
         elif rating_type == 'goal_difference':
             rating = self.get_current_goal_difference()
-        else: raise AssertionError(f'wrong rating_type: {rating_type}')
+        else:
+            raise AssertionError(f'wrong rating_type: {rating_type}')
         return rating
 
     def can_approve_match(self, match):
@@ -112,7 +113,7 @@ class User(UserMixin, db.Model):
             return True
         else:
             return False
-        
+
     def get_recent_match_timestamp(self):
         sorted_matches = sorted(self.matches, key=lambda x: x.timestamp, reverse=True)
         try:
