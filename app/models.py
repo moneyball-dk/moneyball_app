@@ -114,6 +114,10 @@ class User(UserMixin, db.Model):
         else:
             return False
 
+    def can_delete_match(self, match):
+        if self in match.players: return True
+        else: return False
+
     def get_recent_match_timestamp(self):
         sorted_matches = sorted(self.matches, key=lambda x: x.timestamp, reverse=True)
         try:
@@ -125,7 +129,6 @@ class User(UserMixin, db.Model):
 
     def get_winstreak(self):
         winstreak = 0
-        # TODO: Make sure this is looping from newest to oldest.
         for m in self.matches[::-1]:
             if self in m.winning_players:
                 winstreak += 1
