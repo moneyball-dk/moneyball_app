@@ -125,7 +125,7 @@ class User(UserMixin, db.Model):
             return most_recent_match.timestamp
         except IndexError:
             # If no matches played, return current time
-            return datetime.now()
+            return datetime.min
 
     def get_winstreak(self):
         winstreak = 0
