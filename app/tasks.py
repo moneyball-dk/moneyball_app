@@ -160,13 +160,16 @@ def approve_match(match, approver):
     return 'Match approved'
 
 def make_new_match(winners, losers, w_score, l_score, importance, 
-    user_creating_match=None):
+    user_creating_match=None, timestamp=None):
+    if timestamp is None:
+        timestamp = datetime.now()
     approved_winner, approved_loser = False, False
     if user_creating_match in winners:
         approved_winner = True
     elif user_creating_match in losers:
         approved_loser = True
     match = Match(
+        timestamp = timestamp,
         winner_score=w_score, 
         loser_score=l_score,
         importance=importance,
