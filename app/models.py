@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime
 from dateutil.tz import gettz
-from functools import partial
 
 tz = gettz('Europe/Copenhagen')
 
@@ -154,7 +153,7 @@ class UserMatch(db.Model):
     match = db.relationship('Match', foreign_keys=match_id )
 
 def copenhagen_now():
-    return partial(datetime.now, tz=tz)
+    return datetime.now(tz=tz)
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)

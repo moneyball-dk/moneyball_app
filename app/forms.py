@@ -6,7 +6,6 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from app.models import User
 from datetime import datetime
 from dateutil.tz import gettz
-from functools import partial
 
 tz = gettz('Europe/Copenhagen')
 
@@ -48,8 +47,9 @@ def sort_players():
             x.shortname),
         reverse=True
         )
+
 def copenhagen_now():
-    return partial(datetime.now, tz=tz)
+    return datetime.now(tz=tz)
 
 class CreateMatchForm(FlaskForm):
     timestamp = DateTimeField("Match played at", default=copenhagen_now)
