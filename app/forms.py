@@ -67,7 +67,7 @@ class CreateMatchForm(FlaskForm):
         coerce=int,
         default=10,
         validators=[my_check_scores]) 
-    loser_score= SelectField('Winning Score',
+    loser_score= SelectField('Losing Score',
         choices=[(k, k) for k in range(11)],
         coerce=int,
         default=0,
