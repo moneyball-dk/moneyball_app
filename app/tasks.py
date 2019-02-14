@@ -2,6 +2,8 @@ from app import db
 from app.models import User, Rating, Match, UserMatch
 from datetime import datetime
 import trueskill as ts
+from dateutil.tz import gettz
+tz = gettz('Europe/Copenhagen')
 
 def create_user(shortname, nickname, password):
     sn_user = User.query.filter(User.shortname == shortname.upper()).first()
@@ -23,7 +25,7 @@ def create_user(shortname, nickname, password):
 
 def init_ratings(user, timestamp=None):
     if timestamp is None:
-        timestamp = datetime.now()
+        timestamp = datetime.now(tz=tz)
     r_elo = Rating(user=user, rating_type='elo', rating_value=1500,
         timestamp=timestamp)
     r_ts_m = Rating(user=user, rating_type='trueskill_mu',
@@ -169,7 +171,7 @@ def approve_match(match, approver):
 def make_new_match(winners, losers, w_score, l_score, importance,
     user_creating_match=None, timestamp=None):
     if timestamp is None:
-        timestamp = datetime.now()
+        timestamp = datetime.now(tz=tz)
     approved_winner, approved_loser = False, False
     if user_creating_match in winners:
         approved_winner = True
