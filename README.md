@@ -1,11 +1,9 @@
-master: [![Build Status: master](https://travis-ci.org/KPLauritzen/moneyball_app.svg?branch=master)](https://travis-ci.org/KPLauritzen/moneyball_app)
-develop: [![Build Status: develop](https://travis-ci.org/KPLauritzen/moneyball_app.svg?branch=develop)](https://travis-ci.org/KPLauritzen/moneyball_app)
+master: [![Build Status: master](https://travis-ci.org/moneyball-dk/moneyball_app.svg?branch=master)](https://travis-ci.org/moneyball-dk/moneyball_app)
+develop: [![Build Status: develop](https://travis-ci.org/moneyball-dk/moneyball_app.svg?branch=develop)](https://travis-ci.org/moneyball-dk/moneyball_app)
 # Moneyball website
 
 A webapp to track results of foosball games in financial institutions. 
 It is a very niche market!
-
-It is mostly a copy of the [Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world), with some small changes.
 
 ## Prerequisites
 
@@ -21,7 +19,7 @@ source activate flask
 
 Download the source code
 ```
-git clone https://github.com/KPLauritzen/moneyball_app.git
+git clone https://github.com/moneyball-dk/moneyball_app.git
 cd moneyball_app
 ```
 
@@ -38,4 +36,9 @@ flask db upgrade
 Start the webserver
 ```
 flask run
+```
+
+Run the tests
+```
+pytest
 ```
