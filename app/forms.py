@@ -4,7 +4,11 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.validators import DataRequired, ValidationError, EqualTo, Optional
 from wtforms.ext.dateutil.fields import DateTimeField
 from app.models import User
-import datetime
+from datetime import datetime
+from dateutil.tz import gettz
+
+tz = gettz('Europe/Copenhagen')
+
 
 class LoginForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
@@ -44,10 +48,10 @@ def sort_players():
         reverse=True
         )
 
+def copenhagen_now():
+    return datetime.now(tz=tz)
+
 class CreateMatchForm(FlaskForm):
-    timestamp = DateTimeField("Match played at", default=datetime.datetime.now)
-    winner_score = IntegerField('Winning Score', validators=[my_check_scores])
-    loser_score = IntegerField('Losing Score', validators=[my_check_scores])
     winners = QuerySelectMultipleField(
         'Winners',
         validators=[DataRequired()],
@@ -58,11 +62,22 @@ class CreateMatchForm(FlaskForm):
         validators=[DataRequired()],
         query_factory = sort_players,
           )
+    winner_score = SelectField('Winning Score',
+        choices=[(k, k) for k in range(11)],
+        coerce=int,
+        default=10,
+        validators=[my_check_scores]) 
+    loser_score= SelectField('Losing Score',
+        choices=[(k, k) for k in range(11)],
+        coerce=int,
+        default=0,
+        validators=[my_check_scores]) 
 
     importance = SelectField('Match Importance',
         choices=[(k, k) for k in [8, 16, 32]],
         coerce=int,
         default=16)
+    timestamp = DateTimeField("Match played at", default=copenhagen_now, id='datepick')
     submit = SubmitField('Submit')
 
 
