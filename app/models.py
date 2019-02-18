@@ -90,9 +90,9 @@ class User(UserMixin, db.Model):
         Count number of approved matches for User. Used in Matches Played ranking
         """
         # Use ratings to only find approved matches
+        # Select just one type of Rating. Otherwise we are overcounting
         ratings = Rating.query \
             .filter(Rating.user_id == self.id) \
-            # Select just one type of Rating. Otherwise we are overcounting
             .filter(Rating.rating_type == 'elo') \
             .all()
         return len(ratings)
