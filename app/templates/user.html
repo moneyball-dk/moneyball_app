@@ -10,17 +10,7 @@
     <a href="{{ url_for('route_edit_user') }}">Edit User</a>
     {% endif %}
     <hr>
-    {% if matches %}
-    <h2>Matches:</h2>
-    <h3>Won:</h3>
-    {% for match in user.won_matches %}
-        {{ link_match(match, user) }}
-    {% endfor %}
-    <h3>Lost:</h3>
-    {% for match in user.lost_matches %}
-        {{ link_match(match, user) }}
-    {% endfor %}
-    {% endif %}
+
 
     <h2>Stats</h2>
     Elo: {{ user.get_current_elo()|round|int }} <br>
@@ -35,5 +25,21 @@
     Winrate: {{ winrate }} % <br>
     Winstreak: {{ user.get_winstreak()|int }}
 {{ b_div|safe }}
+
+{% if matches %}
+<h2>Latest matches:</h2>
+<h3>Won:</h3>
+{% for match in user.won_matches[-10:] %}
+    {{ link_match(match, user) }}
+{% endfor %}
+<h3>Lost:</h3>
+{% for match in user.lost_matches[-10:] %}
+    {{ link_match(match, user) }}
+{% endfor %}
+<h3>
+<a href="{{ url_for('route_user_all_matches', user_id=user.id) }}">All matches</a>
+</h3>
+
+{% endif %}
 
 {% endblock %}
