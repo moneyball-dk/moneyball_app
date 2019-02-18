@@ -95,7 +95,7 @@ class User(UserMixin, db.Model):
             .filter(Rating.user_id == self.id) \
             .filter(Rating.rating_type == 'elo') \
             .all()
-        return len(ratings)
+        return len(ratings) - 1
 
 
     def get_match_rating_value(self, match, rating_type='elo'):
