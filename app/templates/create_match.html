@@ -3,8 +3,9 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 {% endblock %}
 
 
@@ -26,6 +27,7 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/locale/en-gb.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
   <script type="text/javascript">
     $(function () {
       $('#datepick').datetimepicker({
@@ -37,4 +39,18 @@
       });
     });
   </script>
+  <script type="text/javascript">
+   $(function () {
+       $('#selectpicker_w').selectpicker({
+           liveSearch:true,
+       });
+   });
+   $(function () {
+       $('#selectpicker_l').selectpicker({
+           liveSearch:true,
+       });
+   });
+
+  </script>
+
 {% endblock %}
