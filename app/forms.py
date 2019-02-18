@@ -105,6 +105,8 @@ class ChooseLeaderboardSorting(FlaskForm):
         choices=[
             ('elo', 'Elo'),
             ('trueskill', 'Trueskill'),
-            ('goal_difference', 'Goal difference')],
+            ('goal_difference', 'Goal difference'),
+            ('matches_played', 'Matches Played'),
+            ],
         default='elo')
     submit = SubmitField('Submit')
