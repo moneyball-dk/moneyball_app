@@ -85,6 +85,18 @@ class User(UserMixin, db.Model):
         except AttributeError:
             return 0
 
+    def get_current_number_matches_approved(self):
+        """
+        Count number of approved matches for User. Used in Matches Played ranking
+        """
+        # Use ratings to only find approved matches
+        # Select just one type of Rating. Otherwise we are overcounting
+        ratings = Rating.query \
+            .filter(Rating.user_id == self.id) \
+            .filter(Rating.rating_type == 'elo') \
+            .all()
+        return len(ratings) - 1
+
 
     def get_match_rating_value(self, match, rating_type='elo'):
         rating = Rating.query \
@@ -105,6 +117,8 @@ class User(UserMixin, db.Model):
             rating = self.get_current_elo()
         elif rating_type == 'goal_difference':
             rating = self.get_current_goal_difference()
+        elif rating_type == 'matches_played':
+            rating = self.get_current_number_matches_approved()
         else:
             raise AssertionError(f'wrong rating_type: {rating_type}')
         return rating

@@ -75,6 +75,10 @@ def user(user_id):
     return render_template('user.html', user=user, matches=user.matches, 
         b_div=b_div, title='User')
 
+@app.route('/user/<user_id>/all_matches')
+def route_user_all_matches(user_id):
+    user = User.query.filter_by(id=user_id).first_or_404() 
+    return render_template('user_all_matches.html', user=user, matches=user.matches, title='All matches')
 
 @app.route('/match/<match_id>')
 def match(match_id):

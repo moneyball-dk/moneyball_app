@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import link_match %}
+
+{% block app_content %}
+<h1>User: {{ user.shortname }}</h1>
+Nickname: {{ user.nickname }} <br>
+UserID: {{ user.id }} <br>  
+  <hr>
+
+{% if matches %}
+<h2>Latest matches:</h2>
+<h3>Won:</h3>
+{% for match in user.won_matches %}
+    {{ link_match(match, user) }}
+{% endfor %}
+<h3>Lost:</h3>
+{% for match in user.lost_matches %}
+    {{ link_match(match, user) }}
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}

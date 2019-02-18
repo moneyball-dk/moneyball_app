@@ -42,3 +42,23 @@ Run the tests
 ```
 pytest
 ```
+
+
+## Notes for developers
+
+### How to copy DB from moneyball-develop to review app on heroku:
+Get list of backups
+```
+heroku pg:backups --app moneyball-develop
+```
+
+Copy a restore a backup from develop to a review app
+```
+heroku pg:backups:restore moneyball-develop::<backup-id> DATABASE_URL --app <review-app-name>
+```
+For example:
+```
+heroku pg:backups:restore moneyball-develop::b003 DATABASE_URL --app moneyball-develop-pr-74
+```
+After this you will be asked to type in the name of the app you are copying TO to confirm.
+If the review app was already running, you need to restart the app. You do this inside the Heroku web UI.
