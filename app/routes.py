@@ -18,6 +18,7 @@ def index(sorting='elo'):
     form = ChooseLeaderboardSorting()
     sorting = form.sorting.data
     users = User.query.all()
+    users = [u for u in users if u.get_current_number_matches_approved() > 0]
     users = sorted(users, key=lambda u: u.get_current_rating(rating_type=sorting), reverse=True)
     return render_template('index.html', title='Home', users=users, form=form)
 
