@@ -2,7 +2,7 @@ master: [![Build Status: master](https://travis-ci.org/moneyball-dk/moneyball_ap
 develop: [![Build Status: develop](https://travis-ci.org/moneyball-dk/moneyball_app.svg?branch=develop)](https://travis-ci.org/moneyball-dk/moneyball_app)
 # Moneyball website
 
-A webapp to track results of foosball games in financial institutions. 
+A webapp to track results of foosball games in financial institutions.
 It is a very niche market!
 
 ## Prerequisites
@@ -62,3 +62,13 @@ heroku pg:backups:restore moneyball-develop::b003 DATABASE_URL --app moneyball-d
 ```
 After this you will be asked to type in the name of the app you are copying TO to confirm.
 If the review app was already running, you need to restart the app. You do this inside the Heroku web UI.
+
+### How to copy DB from moneyball-develop to local computer:
+Download latest DB:
+```
+$ heroku pg:backups:download --app moneyball-develop
+```
+Restore this to local PostgreSQL database.
+```
+$ /Library/PostgreSQL/10/bin/pg_restore --verbose --clean --no-acl --no-owner -h localhost -U moneyball -d moneyball latest.dump
+```

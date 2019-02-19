@@ -56,28 +56,31 @@ class CreateMatchForm(FlaskForm):
         'Winners',
         validators=[DataRequired()],
         query_factory = sort_players,
+        id='selectpicker_w',
           )
     losers = QuerySelectMultipleField(
         'Losers',
         validators=[DataRequired()],
         query_factory = sort_players,
+        id='selectpicker_l',
           )
     winner_score = SelectField('Winning Score',
         choices=[(k, k) for k in range(11)],
         coerce=int,
         default=10,
-        validators=[my_check_scores]) 
+        validators=[my_check_scores])
     loser_score= SelectField('Losing Score',
         choices=[(k, k) for k in range(11)],
         coerce=int,
         default=0,
-        validators=[my_check_scores]) 
+        validators=[my_check_scores])
 
     importance = SelectField('Match Importance',
         choices=[(k, k) for k in [8, 16, 32]],
         coerce=int,
         default=16)
-    timestamp = DateTimeField("Match played at", default=copenhagen_now, id='datepick')
+    timestamp = DateTimeField("Match played at", default=copenhagen_now,
+        id='datepick')
     submit = SubmitField('Submit')
 
 
