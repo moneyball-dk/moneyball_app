@@ -95,6 +95,7 @@ class User(UserMixin, db.Model):
             .filter(Rating.user_id == self.id) \
             .filter(Rating.rating_type == 'elo') \
             .all()
+        # Remove 1 for the initial rating (elo=1500 when creating the user)
         return len(ratings) - 1
 
 
@@ -141,7 +142,7 @@ class User(UserMixin, db.Model):
             most_recent_match = sorted_matches[0]
             return most_recent_match.timestamp
         except IndexError:
-            # If no matches played, return current time
+            # If no matches played, return earliest possible time
             return datetime.min
 
     def get_winstreak(self):
