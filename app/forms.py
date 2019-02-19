@@ -113,3 +113,13 @@ class ChooseLeaderboardSorting(FlaskForm):
             ],
         default='elo')
     submit = SubmitField('Submit')
+
+class SelectPlotResampleForm(FlaskForm):
+    resample_interval = SelectField('Plotting Interval',
+        choices=[
+            ('D', 'Daily'),
+            ('W', 'Weekly')
+        ],
+        default='D',
+        id='selectpicker_resample')
+    submit = SubmitField('Submit')

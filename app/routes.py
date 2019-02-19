@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, SelectPlotResampleForm
 from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, EditPasswordForm, ChooseLeaderboardSorting
 from app.plots import plot_ratings
 import time
@@ -66,14 +66,18 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/user/<user_id>')
+@app.route('/user/<user_id>', methods=['GET', 'POST'])
 def user(user_id):
+    resample_interval = 'D'
     user = User.query.filter_by(id=user_id).first_or_404()
-    b_div = plot_ratings(user.shortname, 'elo')
+    form = SelectPlotResampleForm()
+    if form.validate_on_submit():
+        resample_interval = form.resample_interval.data
+    b_div = plot_ratings(user.shortname, 'elo', resample_interval=resample_interval)
     #b_script, b_div = components(plot)
 
     return render_template('user.html', user=user, matches=user.matches, 
-        b_div=b_div, title='User')
+        b_div=b_div, title='User', form=form)
 
 @app.route('/user/<user_id>/all_matches')
 def route_user_all_matches(user_id):
