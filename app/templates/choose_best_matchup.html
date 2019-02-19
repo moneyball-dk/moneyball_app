@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+{% endblock %}
+
+{% block app_content %}
+Team 1: {{t1}}
+
+Team 2: {{t2}}
+<div class="container">
+    <h1>Select players</h1>
+    <div class="row">
+        <div class='col-sm-6'>
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+  <script type="text/javascript">
+   $(function () {
+       $('#selectpicker_best_matchup').selectpicker({
+           liveSearch:true,
+           maxOptions:4,
+           maxOptionsText:"Select at most 4 players",
+       });
+   });
+
+  </script>
+
+{% endblock %}

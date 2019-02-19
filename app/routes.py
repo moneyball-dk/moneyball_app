@@ -5,8 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, EditPasswordForm, ChooseLeaderboardSorting
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, EditPasswordForm, ChooseBestMatchupForm
 from app.plots import plot_ratings
 import time
 
@@ -72,12 +71,12 @@ def user(user_id):
     b_div = plot_ratings(user.shortname, 'elo')
     #b_script, b_div = components(plot)
 
-    return render_template('user.html', user=user, matches=user.matches, 
+    return render_template('user.html', user=user, matches=user.matches,
         b_div=b_div, title='User')
 
 @app.route('/user/<user_id>/all_matches')
 def route_user_all_matches(user_id):
-    user = User.query.filter_by(id=user_id).first_or_404() 
+    user = User.query.filter_by(id=user_id).first_or_404()
     return render_template('user_all_matches.html', user=user, matches=user.matches, title='All matches')
 
 @app.route('/match/<match_id>')
@@ -201,12 +200,27 @@ def route_approval_pending(user_id):
 @app.route('/rules')
 def rules():
     return render_template('rules.html')
-  
+
 @app.route('/.well-known/change-password')
 def route_well_known_change_password():
     """
-    Redirect to change password page. 
+    Redirect to change password page.
     See https://github.com/WICG/change-password-url/blob/gh-pages/explainer.md
     """
     return redirect(url_for('route_edit_password'))
 
+
+@app.route('/best_matchup', methods=['GET', 'POST'])
+@login_required
+def route_best_matchup():
+    t1, t2 = None, None
+    if not current_user.is_authenticated:
+        flash('You have to login before creating a match.')
+        return redirect(url_for('index'))
+    form = ChooseBestMatchupForm()
+    if form.validate_on_submit():
+        players = form.players.data
+        t1, t2 = tasks.choose_best_matchup(players)
+    return render_template('choose_best_matchup.html',
+                           title='Choose best matchup',
+                           form=form, t1=t1, t2=t2)

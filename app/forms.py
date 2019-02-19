@@ -113,3 +113,12 @@ class ChooseLeaderboardSorting(FlaskForm):
             ],
         default='elo')
     submit = SubmitField('Submit')
+
+class ChooseBestMatchupForm(FlaskForm):
+    players = QuerySelectMultipleField(
+        'Players',
+        validators=[DataRequired()],
+        query_factory = sort_players,
+        id='selectpicker_best_matchup',
+          )
+    submit = SubmitField('Submit')
