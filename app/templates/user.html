@@ -3,11 +3,6 @@
 {% from "_formhelpers.html" import link_match %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block head %}
-{{ super() }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
-{% endblock %}
-
 {% block app_content %}
     <h1>User: {{ user.shortname }}</h1>
     Nickname: {{ user.nickname }} <br>
@@ -61,18 +56,5 @@
 </h3>
 
 {% endif %}
-
-{% endblock %}
-
-
-{% block scripts %}
-  {{ super() }}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
-  <script type="text/javascript">
-   $(function () {
-       $('#selectpicker_resample').selectpicker();
-   });
-
-  </script>
 
 {% endblock %}
