@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import link_user_rating%}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+{% endblock %}
+
+{% block app_content %}
+{% if t1 %}
+<h3>Team 1:</h3>
+{% if t1 %}
+<ol>
+    {% for u in t1 %}
+    <li>
+        {{link_user_rating(u, form.rating_type.data)}}
+    </li>
+    {% endfor %}
+</ol>
+{% endif %}
+
+<h3>Team 2:</h3>
+{% if t2 %}
+<ol>
+    {% for u in t2 %}
+    <li>
+        {{link_user_rating(u, form.rating_type.data)}}
+    </li>
+    {% endfor %}
+</ol>
+{% endif %}
+{% endif %}
+
+<div class="container">
+    <h1>Select players</h1>
+    <div class="row">
+        <div class='col-sm-6'>
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
+  <script type="text/javascript">
+   $(function () {
+       $('#selectpicker_best').selectpicker({
+           liveSearch:true,
+           maxOptions:4,
+           maxOptionsText:"Select at most 4 players",
+       });
+   });
+
+  </script>
+
+{% endblock %}

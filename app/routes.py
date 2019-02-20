@@ -5,8 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, SelectPlotResampleForm
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, EditPasswordForm, ChooseLeaderboardSorting
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, EditPasswordForm, ChooseBestMatchupForm, SelectPlotResampleForm
 from app.plots import plot_ratings
 import time
 
@@ -18,6 +17,7 @@ def index(sorting='elo'):
     form = ChooseLeaderboardSorting()
     sorting = form.sorting.data
     users = User.query.all()
+    users = [u for u in users if u.get_current_number_matches_approved() > 0]
     users = sorted(users, key=lambda u: u.get_current_rating(rating_type=sorting), reverse=True)
     return render_template('index.html', title='Home', users=users, form=form)
 
@@ -73,15 +73,21 @@ def user(user_id):
     form = SelectPlotResampleForm()
     if form.validate_on_submit():
         resample_interval = form.resample_interval.data
-    b_div = plot_ratings(user.shortname, 'elo', resample_interval=resample_interval)
-    #b_script, b_div = components(plot)
+    b_div = plot_ratings(user.shortname, 'elo',
+                         resample_interval=resample_interval)
+    matches_pending = []
+    for m in user.matches:
+        if user.can_approve_match(m):
+            matches_pending.append(m)
 
-    return render_template('user.html', user=user, matches=user.matches, 
-        b_div=b_div, title='User', form=form)
+    return render_template('user.html', user=user, matches=user.matches,
+                           b_div=b_div, title='User',
+                           form=form,
+                           matches_pending=matches_pending)
 
 @app.route('/user/<user_id>/all_matches')
 def route_user_all_matches(user_id):
-    user = User.query.filter_by(id=user_id).first_or_404() 
+    user = User.query.filter_by(id=user_id).first_or_404()
     return render_template('user_all_matches.html', user=user, matches=user.matches, title='All matches')
 
 @app.route('/match/<match_id>')
@@ -190,27 +196,31 @@ def route_approve_match(match_id):
     flash(msg)
     return redirect(url_for('index'))
 
-@app.route('/user/<user_id>/approval_pending')
-@login_required
-def route_approval_pending(user_id):
-    user = User.query.filter_by(id=user_id).first_or_404()
-    matches = user.matches
-    matches_pending_user_approval = []
-    for m in matches:
-        if user.can_approve_match(m):
-            matches_pending_user_approval.append(m)
-
-    return render_template('approval_pending.html', matches=matches_pending_user_approval)
-
 @app.route('/rules')
 def rules():
     return render_template('rules.html')
-  
+
 @app.route('/.well-known/change-password')
 def route_well_known_change_password():
     """
-    Redirect to change password page. 
+    Redirect to change password page.
     See https://github.com/WICG/change-password-url/blob/gh-pages/explainer.md
     """
     return redirect(url_for('route_edit_password'))
 
+
+@app.route('/best_matchup', methods=['GET', 'POST'])
+@login_required
+def route_best_matchup():
+    t1, t2 = None, None
+    if not current_user.is_authenticated:
+        flash('You have to login before creating a match.')
+        return redirect(url_for('index'))
+    form = ChooseBestMatchupForm()
+    if form.validate_on_submit():
+        players = form.players.data
+        rating_type = form.rating_type.data
+        t1, t2 = tasks.choose_best_matchup(players, rating_type)
+    return render_template('choose_best_matchup.html',
+                           title='Choose best matchup',
+                           form=form, t1=t1, t2=t2)
