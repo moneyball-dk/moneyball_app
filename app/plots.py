@@ -24,7 +24,7 @@ def get_ratings(shortname, rating_type='elo'):
 
     return source
 
-def plot_ratings(shortname, rating_type):
+def plot_ratings(shortname, rating_type, resample_interval):
     """
     Gather the ratings for a user, construct a plot and return the ´div´ element holding the plot
     """
@@ -35,7 +35,7 @@ def plot_ratings(shortname, rating_type):
         data = get_scatter_plot(source)
     else:
         # Plot candlestick if we have enough observations
-        data = get_candlestick_plot(source)
+        data = get_candlestick_plot(source, resample_interval=resample_interval)
 
     data_comp = [data]
     layout_comp = go.Layout(
@@ -78,11 +78,10 @@ def get_scatter_plot(source):
         )
     return data
     
-def get_candlestick_plot(source):
+def get_candlestick_plot(source, resample_interval='D'):
     # (1) Resample source dataframe so that there is one entry for every resample interval.
     # (2) Convert the source dataframe to a dataframe with four columns: open, high, low, close.
     # (3) Fill in empty rows.
-    resample_interval = "D"
     series = source.set_index("date").loc[:,"rating"]
     resampled = series.resample(resample_interval)
     df_new = resampled.last()
