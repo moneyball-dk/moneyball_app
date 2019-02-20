@@ -1,6 +1,7 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 {% extends "base.html" %}
 {% from "_formhelpers.html" import link_match %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block app_content %}
     <h1>User: {{ user.shortname }}</h1>
@@ -24,7 +25,10 @@
     {% endif %}
     Winrate: {{ winrate }} % <br>
     Winstreak: {{ user.get_winstreak()|int }}
-{{ b_div|safe }}
+
+            {{ wtf.quick_form(form) }}
+
+    {{ b_div|safe }}
 
 {% if matches %}
 <h2>Latest matches:</h2>
@@ -36,6 +40,17 @@
 {% for match in user.lost_matches[-10:] %}
     {{ link_match(match, user) }}
 {% endfor %}
+
+
+<h3>Matches pending approval</h3>
+{% if matches_pending %}
+{% for m in matches_pending %}
+{{link_match(m, current_user)}}
+{% endfor %}
+{% else %}
+<p> No matches need approval. Go play some more foosball! </p>
+{% endif %}
+
 <h3>
 <a href="{{ url_for('route_user_all_matches', user_id=user.id) }}">All matches</a>
 </h3>

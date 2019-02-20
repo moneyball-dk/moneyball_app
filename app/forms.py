@@ -113,3 +113,29 @@ class ChooseLeaderboardSorting(FlaskForm):
             ],
         default='elo')
     submit = SubmitField('Submit')
+
+class ChooseBestMatchupForm(FlaskForm):
+    players = QuerySelectMultipleField(
+        'Players',
+        validators=[DataRequired()],
+        query_factory = sort_players,
+        id='selectpicker_best',
+          )
+    rating_type = SelectField('Rating to use',
+        choices=[
+            ('elo', 'Elo'),
+            ('trueskill', 'Trueskill'),
+            ('goal_difference', 'Goal difference'),
+            ('matches_played', 'Matches Played'),
+            ],
+        default='elo')
+    submit = SubmitField('Submit')
+class SelectPlotResampleForm(FlaskForm):
+    resample_interval = SelectField('Plotting Interval',
+        choices=[
+            ('D', 'Daily'),
+            ('W', 'Weekly')
+        ],
+        default='D',
+        id='selectpicker_resample')
+    submit = SubmitField('Submit')

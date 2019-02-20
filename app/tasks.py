@@ -3,6 +3,7 @@ from app.models import User, Rating, Match, UserMatch
 from datetime import datetime
 import trueskill as ts
 from dateutil.tz import gettz
+import numpy as np
 tz = gettz('Europe/Copenhagen')
 
 def create_user(shortname, nickname, password):
@@ -217,3 +218,22 @@ def update_password(user, password):
         user.set_password(password)
     db.session.commit()
     return user
+
+def choose_best_matchup(players, rating_type='elo'):
+    # Sort players according to rating
+    players = sorted(players, key=lambda x: x.get_current_rating(rating_type=rating_type))
+    # Return best match for 2, 3, and 4 players
+    if len(players) == 2:
+        # Trivial
+        return [players[0]], [players[1]]
+    elif len(players) == 3:
+        # 2 worst against the best
+        t1 = players[:2]
+        t2 = players[-1:]
+        return t1, t2
+    elif len(players) == 4:
+        # Best and worst together against the middle
+        t1 = [players[0], players[3]]
+        t2 = [players[1], players[2]]
+        return t1, t2
+    return players, None
