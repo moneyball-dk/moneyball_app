@@ -28,7 +28,7 @@
                     {% else %}
                     <li><a href="{{ url_for('user', user_id=current_user.id) }}">{{current_user.shortname}}</a></li>
                     <li><a href="{{ url_for('rules') }}">Rules</a></li>
-                    <li><a href="{{ url_for('route_approval_pending', user_id=current_user.id) }}">Matches pending approval</a></li>
+                    <li><a href="{{ url_for('route_best_matchup') }}">Find best matchup</a></li>
                     <li><a href="{{ url_for('create_match') }}">Register a new match result</a></li>
                     <li><a href="{{ url_for('route_recalculate_ratings') }}">Recalculate Ratings</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>

@@ -36,6 +36,17 @@
 {% for match in user.lost_matches[-10:] %}
     {{ link_match(match, user) }}
 {% endfor %}
+
+
+<h3>Matches pending approval</h3>
+{% if matches_pending %}
+{% for m in matches_pending %}
+{{link_match(m, current_user)}}
+{% endfor %}
+{% else %}
+<p> No matches need approval. Go play some more foosball! </p>
+{% endif %}
+
 <h3>
 <a href="{{ url_for('route_user_all_matches', user_id=user.id) }}">All matches</a>
 </h3>
