@@ -219,20 +219,20 @@ def update_password(user, password):
     db.session.commit()
     return user
 
-def choose_best_matchup(players):
-    # Get elo ratings for each player
-    elos = [p.get_current_elo() for p in players]
-    # Generate all combinations of players into 2 teams
+def choose_best_matchup(players, rating_type='elo'):
+    # Sort players according to rating
+    players = sorted(players, key=lambda x: x.get_current_rating(rating_type=rating_type))
+    # Return best match for 2, 3, and 4 players
     if len(players) == 2:
+        # Trivial
         return [players[0]], [players[1]]
     elif len(players) == 3:
-        # Find the highest rating index
-        players = sorted(players, key=lambda x: x.get_current_elo())
+        # 2 worst against the best
         t1 = players[:2]
-        t2 = players[-1]
+        t2 = players[-1:]
         return t1, t2
     elif len(players) == 4:
-        players = sorted(players, key=lambda x: x.get_current_elo())
+        # Best and worst together against the middle
         t1 = [players[0], players[3]]
         t2 = [players[1], players[2]]
         return t1, t2

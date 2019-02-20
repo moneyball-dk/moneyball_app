@@ -69,10 +69,13 @@ def register():
 def user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
     b_div = plot_ratings(user.shortname, 'elo')
-    #b_script, b_div = components(plot)
+    matches_pending = []
+    for m in user.matches:
+        if user.can_approve_match(m):
+            matches_pending.append(m)
 
     return render_template('user.html', user=user, matches=user.matches,
-        b_div=b_div, title='User')
+                           b_div=b_div, title='User', matches_pending=matches_pending)
 
 @app.route('/user/<user_id>/all_matches')
 def route_user_all_matches(user_id):
@@ -185,18 +188,6 @@ def route_approve_match(match_id):
     flash(msg)
     return redirect(url_for('index'))
 
-@app.route('/user/<user_id>/approval_pending')
-@login_required
-def route_approval_pending(user_id):
-    user = User.query.filter_by(id=user_id).first_or_404()
-    matches = user.matches
-    matches_pending_user_approval = []
-    for m in matches:
-        if user.can_approve_match(m):
-            matches_pending_user_approval.append(m)
-
-    return render_template('approval_pending.html', matches=matches_pending_user_approval)
-
 @app.route('/rules')
 def rules():
     return render_template('rules.html')
@@ -220,7 +211,8 @@ def route_best_matchup():
     form = ChooseBestMatchupForm()
     if form.validate_on_submit():
         players = form.players.data
-        t1, t2 = tasks.choose_best_matchup(players)
+        rating_type = form.rating_type.data
+        t1, t2 = tasks.choose_best_matchup(players, rating_type)
     return render_template('choose_best_matchup.html',
                            title='Choose best matchup',
                            form=form, t1=t1, t2=t2)

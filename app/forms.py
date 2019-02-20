@@ -119,6 +119,14 @@ class ChooseBestMatchupForm(FlaskForm):
         'Players',
         validators=[DataRequired()],
         query_factory = sort_players,
-        id='selectpicker_best_matchup',
+        id='selectpicker_best',
           )
+    rating_type = SelectField('Rating to use',
+        choices=[
+            ('elo', 'Elo'),
+            ('trueskill', 'Trueskill'),
+            ('goal_difference', 'Goal difference'),
+            ('matches_played', 'Matches Played'),
+            ],
+        default='elo')
     submit = SubmitField('Submit')
