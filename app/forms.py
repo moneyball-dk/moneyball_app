@@ -1,15 +1,29 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectMultipleField, IntegerField, SelectField, DateField
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import DataRequired, ValidationError, EqualTo, Optional
 from wtforms.ext.dateutil.fields import DateTimeField
-from app.models import User
+from app.models import User, Company
 from datetime import datetime
 from dateutil.tz import gettz
-
+from flask_login import current_user
 tz = gettz('Europe/Copenhagen')
 
+def get_companies():
+    return Company.query.all()
 
+def get_players_from_company():
+    players = User.query.filter_by(company_id=current_user.company_id).all()
+    return sorted_users(players)
+
+def sorted_users(users):
+    return sorted(
+        [u for u in users],
+        key=lambda x: (
+            x.get_recent_match_timestamp(),
+            x.shortname),
+        reverse=True
+        ) 
 class LoginForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -19,6 +33,8 @@ class LoginForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     shortname = StringField('Shortname (eg KWIL)', validators=[DataRequired()])
     nickname = StringField('Nickname (Eg Flying Cobra)', validators=[DataRequired()])
+    company = QuerySelectField ('Company', 
+        query_factory=get_companies)
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat password', validators=[DataRequired(), EqualTo('password')]
@@ -55,13 +71,13 @@ class CreateMatchForm(FlaskForm):
     winners = QuerySelectMultipleField(
         'Winners',
         validators=[DataRequired()],
-        query_factory = sort_players,
+        query_factory = get_players_from_company,
         id='selectpicker_w',
           )
     losers = QuerySelectMultipleField(
         'Losers',
         validators=[DataRequired()],
-        query_factory = sort_players,
+        query_factory = get_players_from_company,
         id='selectpicker_l',
           )
     winner_score = SelectField('Winning Score',
@@ -89,10 +105,11 @@ class CreateMatchForm(FlaskForm):
             if l in self.winners.data:
                 raise ValidationError('Same user cannot be both winner and loser')
 
-
 class EditUserForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
     nickname = StringField('Nickname', validators=[DataRequired()])
+    company = QuerySelectField ('Company', 
+        query_factory=get_companies)
     submit = SubmitField('Submit')
 
 
@@ -138,4 +155,8 @@ class SelectPlotResampleForm(FlaskForm):
         ],
         default='D',
         id='selectpicker_resample')
+    submit = SubmitField('Submit')
+
+class CreateCompanyForm(FlaskForm):
+    name = StringField('Company Name', validators=[DataRequired()])
     submit = SubmitField('Submit')

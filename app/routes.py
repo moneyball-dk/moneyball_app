@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, EditPasswordForm, ChooseBestMatchupForm, SelectPlotResampleForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, EditPasswordForm, ChooseBestMatchupForm, SelectPlotResampleForm, CreateCompanyForm
 from app.plots import plot_ratings
 import time
 
@@ -16,7 +16,10 @@ from app import tasks
 def index(sorting='elo'):
     form = ChooseLeaderboardSorting()
     sorting = form.sorting.data
-    users = User.query.all()
+    if current_user.is_authenticated:
+        users = User.query.filter_by(company_id=current_user.company_id).all()
+    else:
+        users = User.query.all()
     users = [u for u in users if u.get_current_number_matches_approved() > 0]
     users = sorted(users, key=lambda u: u.get_current_rating(rating_type=sorting), reverse=True)
     return render_template('index.html', title='Home', users=users, form=form)
@@ -57,7 +60,8 @@ def register():
         user = tasks.create_user(
             shortname=form.shortname.data.upper(),
             nickname=form.nickname.data,
-            password=form.password.data
+            password=form.password.data,
+            company=form.company.data,
         )
         if isinstance(user, User):
             flash('Congratulations! You are registered.')
@@ -163,6 +167,7 @@ def route_edit_other_user(user_id):
             user=user,
             shortname=shortname,
             nickname=form.nickname.data,
+            company=form.company.data
         )
         flash(f'User {user} updated')
         return redirect(url_for('user', user_id=user.id))
@@ -224,3 +229,16 @@ def route_best_matchup():
     return render_template('choose_best_matchup.html',
                            title='Choose best matchup',
                            form=form, t1=t1, t2=t2)
+
+@app.route('/create_company', methods=['GET', 'POST'])
+@login_required
+def create_company():
+    if not current_user.is_authenticated:
+        flash('You have to login before creating a match.')
+        return redirect(url_for('index'))
+
+    form = CreateCompanyForm()
+    if form.validate_on_submit():
+        company_name = form.name.data
+        tasks.create_company(company_name)
+    return render_template('add_company.html', title='Create company', form=form)
