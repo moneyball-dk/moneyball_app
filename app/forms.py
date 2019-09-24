@@ -33,8 +33,10 @@ class LoginForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     shortname = StringField('Shortname (eg KWIL)', validators=[DataRequired()])
     nickname = StringField('Nickname (Eg Flying Cobra)', validators=[DataRequired()])
-    company = QuerySelectField ('Company', 
-        query_factory=get_companies)
+    company = QuerySelectField (
+        'Company', 
+        query_factory=get_companies,
+        allow_blank=True)
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat password', validators=[DataRequired(), EqualTo('password')]
