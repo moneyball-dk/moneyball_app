@@ -1,1 +1,1 @@
-web: flask db upgrade; gunicorn moneyball:app
+web: flask db upgrade; gunicorn moneyball:app --timeout 60
