@@ -111,7 +111,7 @@ class EditUserForm(FlaskForm):
     shortname = StringField('Shortname', validators=[DataRequired()])
     nickname = StringField('Nickname', validators=[DataRequired()])
     company = QuerySelectField ('Company', 
-        query_factory=get_companies)
+        query_factory=get_companies, allow_blank=True)
     submit = SubmitField('Submit')
 
 
