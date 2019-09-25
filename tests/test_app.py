@@ -121,7 +121,6 @@ def test_user_page(test_client, filled_db):
     response = test_client.get('/user/1')
     assert response.status_code == 200
     assert b'User' in response.data
-    assert b'UserID: 1' in response.data
 
     # Test 404 error for wrong user id
     response = test_client.get('/user/1000')
