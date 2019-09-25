@@ -94,7 +94,14 @@ def test_create_user(filled_db):
             company=None,
         )
 
+def test_create_company(filled_db):
+    from app.tasks import create_company
+    c1 = create_company(company_name = 'unique_name')
+    assert c1.name == 'unique_name'
 
+    with pytest.raises(AssertionError):
+        c1 = create_company(company_name = 'unique_name')
+    
 def test_approve_match(filled_db):
     from app.tasks import approve_match, make_new_match
     from app.models import User
