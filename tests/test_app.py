@@ -140,7 +140,6 @@ def test_plot_candlestick(test_client, many_matches_db):
     response = test_client.get('/user/1')
     assert response.status_code == 200
     assert b'User' in response.data
-    assert b'UserID: 1' in response.data
 
 
 def test_match_page(test_client, filled_db):
