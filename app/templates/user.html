@@ -6,7 +6,6 @@
 {% block app_content %}
     <h1>User: {{ user.shortname }}</h1>
     Nickname: {{ user.nickname }} <br>
-    UserID: {{ user.id }} <br>
     Company: {{ user.company }} <br>
     {% if user == current_user %}
     <a href="{{ url_for('route_edit_user') }}">Edit User</a>
