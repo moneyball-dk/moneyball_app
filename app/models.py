@@ -209,9 +209,10 @@ class Table(db.Model):
 
     def __repr__(self):
         return f"<Table - Id {self.id} ;name {self.name}"
+
 class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
 
     def __repr__(self):
-        return f'Company {self.id}: {self.name}'
+        return f'{self.name}'
