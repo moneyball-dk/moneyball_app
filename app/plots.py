@@ -45,7 +45,10 @@ def plot_ratings(shortname, rating_type, resample_interval):
         ),
         yaxis=dict(
             title='Rating',
-    ))
+        ),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
     fig_comp = go.Figure(data=data_comp, layout=layout_comp)
     div = plotly.offline.plot(fig_comp, show_link=False, output_type="div", include_plotlyjs=False)
     return div
