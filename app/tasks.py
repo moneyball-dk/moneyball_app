@@ -69,9 +69,10 @@ def recalculate_ratings(after_time=None):
         update_match_ratings(match)
 
 def delete_match(match):
+    timestamp = match.timestamp
     db.session.delete(match)
     db.session.commit()
-    recalculate_ratings()
+    recalculate_ratings(after_time=timestamp)
 
 def update_match_ratings(match):
     if not match.approved_winner or not match.approved_loser:
