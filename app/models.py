@@ -13,6 +13,9 @@ class User(UserMixin, db.Model):
     shortname = db.Column(db.String(64), index=True, unique=True)
     nickname = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
+    company = db.relationship('Company', foreign_keys=company_id, backref='users')
+
     matches = db.relationship('Match',
         order_by="Match.timestamp",
         secondary='user_match',
@@ -206,3 +209,10 @@ class Table(db.Model):
 
     def __repr__(self):
         return f"<Table - Id {self.id} ;name {self.name}"
+
+class Company(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True)
+
+    def __repr__(self):
+        return f'{self.name}'

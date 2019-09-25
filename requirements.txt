@@ -7,7 +7,7 @@ flask-login
 flask-bootstrap
 flask-moment
 gunicorn
-psycopg2
+psycopg2-binary
 bokeh
 numpy
 pytest

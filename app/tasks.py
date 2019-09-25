@@ -1,12 +1,12 @@
 from app import db
-from app.models import User, Rating, Match, UserMatch
+from app.models import User, Rating, Match, UserMatch, Company
 from datetime import datetime
 import trueskill as ts
 from dateutil.tz import gettz
 import numpy as np
 tz = gettz('Europe/Copenhagen')
 
-def create_user(shortname, nickname, password):
+def create_user(shortname, nickname, password, company):
     sn_user = User.query.filter(User.shortname == shortname.upper()).first()
     nn_user = User.query.filter(User.nickname == nickname).first()
     if sn_user is not None:
@@ -16,7 +16,8 @@ def create_user(shortname, nickname, password):
 
     user = User(
         shortname=shortname.upper(),
-        nickname=nickname
+        nickname=nickname,
+        company=company
     )
     user.set_password(password)
     db.session.add(user)
@@ -207,9 +208,10 @@ def make_new_match(winners, losers, w_score, l_score, importance,
     return match
 
 
-def update_user(user, shortname, nickname):
+def update_user(user, shortname, nickname, company):
     user.shortname = shortname.upper()
     user.nickname = nickname
+    user.company = company
     db.session.commit()
     return user
 
@@ -237,3 +239,14 @@ def choose_best_matchup(players, rating_type='elo'):
         t2 = [players[1], players[2]]
         return t1, t2
     return players, None
+
+def create_company(company_name: str) -> Company:
+    same_name = Company.query.filter(Company.name == company_name).first()
+    if same_name is not None:
+        raise AssertionError('A company with that name already exists')
+
+    company = Company(name=company_name)
+    db.session.add(company)
+    db.session.commit()
+    return company
+

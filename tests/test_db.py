@@ -79,7 +79,8 @@ def test_create_user(filled_db):
     u1 = create_user(
         'NU',
         'New User',
-        'hunter2'
+        password='hunter2',
+        company=None,
     )
 
     assert u1.shortname == 'NU'
@@ -89,10 +90,18 @@ def test_create_user(filled_db):
         u1 = create_user(
             'NU',
             'New User',
-            'hunter2'
+            password='hunter2',
+            company=None,
         )
 
+def test_create_company(filled_db):
+    from app.tasks import create_company
+    c1 = create_company(company_name = 'unique_name')
+    assert c1.name == 'unique_name'
 
+    with pytest.raises(AssertionError):
+        c1 = create_company(company_name = 'unique_name')
+    
 def test_approve_match(filled_db):
     from app.tasks import approve_match, make_new_match
     from app.models import User

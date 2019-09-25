@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
 
 {% block app_content %}
     <h1>Register</h1>
@@ -15,6 +16,13 @@
             {{ form.nickname.label }}<br>
             {{ form.nickname(size=64) }}<br>
             {% for error in form.nickname.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{render_field(form.company)}}
+
+            {% for error in form.company.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
