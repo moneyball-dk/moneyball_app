@@ -16,6 +16,10 @@ def get_players_from_company():
     players = User.query.filter_by(company_id=current_user.company_id).all()
     return sorted_users(players)
 
+def get_players():
+    players = User.query.all()
+    return sorted_users(players)
+
 def sorted_users(users):
     return sorted(
         [u for u in users],
@@ -73,13 +77,13 @@ class CreateMatchForm(FlaskForm):
     winners = QuerySelectMultipleField(
         'Winners',
         validators=[DataRequired()],
-        query_factory = get_players_from_company,
+        query_factory = get_players,
         id='selectpicker_w',
           )
     losers = QuerySelectMultipleField(
         'Losers',
         validators=[DataRequired()],
-        query_factory = get_players_from_company,
+        query_factory = get_players,
         id='selectpicker_l',
           )
     winner_score = SelectField('Winning Score',

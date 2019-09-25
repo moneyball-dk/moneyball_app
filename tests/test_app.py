@@ -129,7 +129,7 @@ def test_user_page(test_client, filled_db):
 
     # Test undefined winrate when no matches played
     from app.tasks import create_user
-    u = create_user(shortname='NM', nickname='No matches', password='123')
+    u = create_user(shortname='NM', nickname='No matches', password='123', company=None)
     response = test_client.get(f'/user/{u.id}')
     assert response.status_code == 200
     assert b'Winrate: Undefined' in response.data

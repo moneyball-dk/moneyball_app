@@ -79,7 +79,8 @@ def test_create_user(filled_db):
     u1 = create_user(
         'NU',
         'New User',
-        'hunter2'
+        password='hunter2',
+        company=None,
     )
 
     assert u1.shortname == 'NU'
@@ -89,7 +90,8 @@ def test_create_user(filled_db):
         u1 = create_user(
             'NU',
             'New User',
-            'hunter2'
+            password='hunter2',
+            company=None,
         )
 
 

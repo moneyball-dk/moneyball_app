@@ -240,7 +240,7 @@ def choose_best_matchup(players, rating_type='elo'):
         return t1, t2
     return players, None
 
-def create_company(company_name):
+def create_company(company_name: str) -> Company:
     same_name = Company.query.filter(Company.name == company_name).first()
     if same_name is not None:
         raise AssertionError('A company with that name already exists')
@@ -248,4 +248,5 @@ def create_company(company_name):
     company = Company(name=company_name)
     db.session.add(company)
     db.session.commit()
+    return company
 

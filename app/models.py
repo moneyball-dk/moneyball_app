@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     shortname = db.Column(db.String(64), index=True, unique=True)
     nickname = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     company = db.relationship('Company', foreign_keys=company_id, backref='users')
 
     matches = db.relationship('Match',
