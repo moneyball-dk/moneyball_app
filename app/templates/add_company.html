@@ -2,6 +2,7 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% block app_content %}
+    {% if current_user.shortname in ['KLAU', 'FPO', 'KLAUR'] %}
     <h1>Add Company</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
@@ -9,4 +10,5 @@
         <d1> {{render_field(form.name)}} </d1>
         <p>{{ form.submit() }}</p>
     </form>
+    {% endif %}
 {% endblock %}
