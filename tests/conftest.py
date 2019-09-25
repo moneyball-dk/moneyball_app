@@ -26,10 +26,12 @@ def empty_db(test_client):
 @pytest.fixture(scope='function')
 def filled_db(empty_db):
     from app.models import User
-    from app.tasks import make_new_match, create_user, approve_match
+    from app.tasks import make_new_match, create_user, approve_match, create_company
 
-    u1 = create_user(shortname='kasper', nickname='7-11', password='123')
-    u2 = create_user(shortname='felipe', nickname='coyote', password='321')
+    c1 = create_company('Company ONE')
+    c2 = create_company('Company TWO')
+    u1 = create_user(shortname='kasper', nickname='7-11', password='123', company=c1)
+    u2 = create_user(shortname='felipe', nickname='coyote', password='321', company=c2)
     
     m1 = make_new_match(winners=[u1], losers=[u2], w_score=10, 
         l_score=9, importance=32, user_creating_match=u1) # Kasper wins
