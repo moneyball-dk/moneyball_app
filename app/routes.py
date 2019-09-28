@@ -151,47 +151,55 @@ def route_edit_user():
 
 @app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 def route_edit_other_user(user_id):
-    form = EditUserForm()
-    user = User.query.filter_by(id=user_id).first_or_404()
-    if form.validate_on_submit():
-        shortname = form.shortname.data.upper()
-        sn_user = User.query.filter_by(shortname=shortname).first()
-        if sn_user is not None and sn_user.id != user.id:
-            flash('That shortname is already taken')
-            return redirect(url_for('route_edit_user', user_id=user.id))
-        nn_user = User.query.filter_by(nickname=form.nickname.data).first()
-        if nn_user is not None and nn_user != user:
-            flash('That nickname is already taken')
-            return redirect(url_for('route_edit_user', user_id=user.id))
-        tasks.update_user(
-            user=user,
-            shortname=shortname,
-            nickname=form.nickname.data,
-            company=form.company.data
-        )
-        flash(f'User {user} updated')
-        return redirect(url_for('user', user_id=user.id))
-    elif request.method == 'GET':
-        form.shortname.data = user.shortname
-        form.nickname.data = user.nickname
-    return render_template('edit_user.html', title='Edit User', form=form)
+    if current_user.id == user_id or current_user.is_admin:
+        form = EditUserForm()
+        user = User.query.filter_by(id=user_id).first_or_404()
+        if form.validate_on_submit():
+            shortname = form.shortname.data.upper()
+            sn_user = User.query.filter_by(shortname=shortname).first()
+            if sn_user is not None and sn_user.id != user.id:
+                flash('That shortname is already taken')
+                return redirect(url_for('route_edit_user', user_id=user.id))
+            nn_user = User.query.filter_by(nickname=form.nickname.data).first()
+            if nn_user is not None and nn_user != user:
+                flash('That nickname is already taken')
+                return redirect(url_for('route_edit_user', user_id=user.id))
+            tasks.update_user(
+                user=user,
+                shortname=shortname,
+                nickname=form.nickname.data,
+                company=form.company.data
+            )
+            flash(f'User {user} updated')
+            return redirect(url_for('user', user_id=user.id))
+        elif request.method == 'GET':
+            form.shortname.data = user.shortname
+            form.nickname.data = user.nickname
+        return render_template('edit_user.html', title='Edit User', form=form)
 
 
 @app.route('/edit_user_password', methods=['GET', 'POST'])
-#@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
 @login_required
 def route_edit_password():
-    form = EditPasswordForm()
-    user = current_user
-    #user = User.query.filter_by(id=user_id).first_or_404()
-    if form.validate_on_submit():
-        tasks.update_password(
-            user=user,
-            password=form.password.data,
-        )
-        flash(f'Password of user {user} updated')
-        return redirect(url_for('user', user_id=user.id))
-    return render_template('edit_user_password.html', title='Moneyball', form=form)
+    user_id = current_user.id
+    return route_edit_any_password(user_id)
+
+@app.route('/user/<user_id>/edit_pass', methods=['GET', 'POST'])
+@login_required
+def route_edit_any_password(user_id):
+    if current_user.id == user_id or current_user.is_admin:
+        form = EditPasswordForm()
+        user = User.query.filter_by(id=user_id).first_or_404()
+        if form.validate_on_submit():
+            tasks.update_password(
+                user=user,
+                password=form.password.data,
+            )
+            flash(f'Password of user {user} updated')
+            return redirect(url_for('user', user_id=user.id))
+        return render_template('edit_user_password.html', title='Moneyball', form=form)
+    else:
+        return False
 
 @app.route('/match/<match_id>/approve', methods=['POST'])
 @login_required
