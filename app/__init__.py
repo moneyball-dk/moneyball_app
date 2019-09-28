@@ -5,14 +5,17 @@ import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 
-from flask import Flask
+from flask import Flask, redirect, url_for
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import flask_login
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
+import flask_admin
 from flask_admin import Admin
+from flask_admin import helpers, expose
 from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
@@ -24,13 +27,30 @@ login.login_view = 'login'
 boostrap = Bootstrap(app=app)
 moment = Moment(app)
 
+class MoneyballModelView(ModelView):
+
+    def is_accessible(self):
+        return flask_login.current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+class MyAdminIndexView(flask_admin.AdminIndexView):
+
+    @expose('/')
+    def index(self):
+        if not flask_login.current_user.is_authenticated:
+            return redirect(url_for('index'))
+        return super(MyAdminIndexView, self).index()
 # admin panels
+
 from app.models import User, Company, Match, Rating
-admin = Admin(app)
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Company, db.session))
-admin.add_view(ModelView(Match, db.session))
-admin.add_view(ModelView(Rating, db.session))
+admin = Admin(app, index_view=MyAdminIndexView())
+admin.add_view(MoneyballModelView(User, db.session))
+admin.add_view(MoneyballModelView(Company, db.session))
+admin.add_view(MoneyballModelView(Match, db.session))
+admin.add_view(MoneyballModelView(Rating, db.session))
 
 if app.config['LOG_TO_STDOUT']:
     stream_handler = logging.StreamHandler()
