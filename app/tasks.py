@@ -49,7 +49,6 @@ def recalculate_ratings(after_time=None):
     for u in users:
         # Get the first timestamp on Rating for each User
         # To initialize first Rating at earliest record of the user.
-        print(u)
         try:
             timestamps.append(Rating.query \
                 .filter(Rating.user_id == u.id) \
