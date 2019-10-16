@@ -54,7 +54,7 @@ def recalculate_ratings(after_time=None):
                 .filter(Rating.user_id == u.id) \
                 .order_by(Rating.timestamp) \
                 .first().timestamp
-            time.replace(tz=tz)
+            time.replace(tzinfo=tz)
             timestamps.append(time)
         except AttributeError:
             time = datetime.now(tz=tz)
