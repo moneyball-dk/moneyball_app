@@ -28,7 +28,6 @@ boostrap = Bootstrap(app=app)
 moment = Moment(app)
 
 class MoneyballModelView(ModelView):
-
     def is_accessible(self):
         return flask_login.current_user.is_authenticated
 
@@ -37,10 +36,11 @@ class MoneyballModelView(ModelView):
         return redirect(url_for('login', next=request.url))
 
 class MyAdminIndexView(flask_admin.AdminIndexView):
-
     @expose('/')
     def index(self):
-        if not flask_login.current_user.is_authenticated:
+        # TODO use this as soon as we have made some admin users
+        #if (not flask_login.current_user.is_authenticated) or (not flask_login.current_user.is_admin):
+        if (not flask_login.current_user.is_authenticated):
             return redirect(url_for('index'))
         return super(MyAdminIndexView, self).index()
 # admin panels
