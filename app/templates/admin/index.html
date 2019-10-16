@@ -1,0 +1,9 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<ul>
+<li><a href="{{ url_for('route_recalculate_ratings') }}">Recalculate Ratings</a></li>
+<li><a href="{{ url_for('create_company') }}">Create company</a></li>
+
+</ul>
+{% endblock %}

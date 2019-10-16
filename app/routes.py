@@ -131,8 +131,9 @@ def create_match():
 @app.route('/recalculate_ratings')
 @login_required
 def route_recalculate_ratings():
-    tasks.recalculate_ratings()
-    flash('Recalculated ratings!')
+    if not current_user.is_admin:
+        tasks.recalculate_ratings()
+        flash('Recalculated ratings!')
     return redirect(url_for('index'))
 
 @app.route('/delete_match/<match_id>', methods=['POST'])
@@ -241,7 +242,7 @@ def route_best_matchup():
 @app.route('/create_company', methods=['GET', 'POST'])
 @login_required
 def create_company():
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated or not current_user.is_admin:
         flash('You have to login before creating a match.')
         return redirect(url_for('index'))
 
