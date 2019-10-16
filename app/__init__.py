@@ -38,9 +38,7 @@ class MoneyballModelView(ModelView):
 class MyAdminIndexView(flask_admin.AdminIndexView):
     @expose('/')
     def index(self):
-        # TODO use this as soon as we have made some admin users
-        #if (not flask_login.current_user.is_authenticated) or (not flask_login.current_user.is_admin):
-        if (not flask_login.current_user.is_authenticated):
+        if (not flask_login.current_user.is_authenticated) or (not flask_login.current_user.is_admin):
             return redirect(url_for('index'))
         return super(MyAdminIndexView, self).index()
 # admin panels
