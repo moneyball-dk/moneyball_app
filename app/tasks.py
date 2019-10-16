@@ -50,10 +50,12 @@ def recalculate_ratings(after_time=None):
         # Get the first timestamp on Rating for each User
         # To initialize first Rating at earliest record of the user.
         try:
-            timestamps.append(Rating.query \
+            time = Rating.query \
                 .filter(Rating.user_id == u.id) \
                 .order_by(Rating.timestamp) \
-                .first().timestamp )
+                .first().timestamp
+            time.replace(tz=tz)
+            timestamps.append(time)
         except AttributeError:
             time = datetime.now(tz=tz)
             # if no rating exists
