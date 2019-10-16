@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     company = db.relationship('Company', foreign_keys=company_id, backref='users')
+    is_admin = db.Column(db.Boolean, default=False)
 
     matches = db.relationship('Match',
         order_by="Match.timestamp",

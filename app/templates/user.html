@@ -7,8 +7,8 @@
     <h1>User: {{ user.shortname }}</h1>
     Nickname: {{ user.nickname }} <br>
     Company: {{ user.company }} <br>
-    {% if user == current_user %}
-    <a href="{{ url_for('route_edit_user') }}">Edit User</a>
+    {% if user == current_user or current_user.is_admin %}
+    <a href="{{ url_for('route_edit_other_user', user_id=user.id) }}">Edit User</a>
     {% endif %}
     <hr>
 
