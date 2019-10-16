@@ -31,7 +31,6 @@
                     <li><a href="{{ url_for('rules') }}">Rules</a></li>
                     <li><a href="{{ url_for('route_best_matchup') }}">Find best matchup</a></li>
                     <li><a href="{{ url_for('create_match') }}">Register a new match result</a></li>
-                    <li><a href="{{ url_for('route_recalculate_ratings') }}">Recalculate Ratings</a></li>
                     {% if current_user.is_admin %}
                     <li><a href="/admin">Admin</a></li>
                     {% endif %}
