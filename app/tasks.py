@@ -6,7 +6,7 @@ from dateutil.tz import gettz
 import numpy as np
 tz = gettz('Europe/Copenhagen')
 
-def create_user(shortname, nickname, password, company, is_admin = None):
+def create_user(shortname, nickname, password, company, is_admin = 0):
     sn_user = User.query.filter(User.shortname == shortname.upper()).first()
     nn_user = User.query.filter(User.nickname == nickname).first()
     if sn_user is not None:
@@ -15,9 +15,9 @@ def create_user(shortname, nickname, password, company, is_admin = None):
         raise AssertionError('Someone has already used that nickname')
 
     user = User(
-        shortname=shortname.upper(),
-        nickname=nickname,
-        company=company,
+        shortname = shortname.upper(),
+        nickname = nickname,
+        company = company,
         is_admin = is_admin
     )
     user.set_password(password)

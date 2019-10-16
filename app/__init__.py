@@ -38,6 +38,10 @@ class MoneyballModelView(ModelView):
 class MyAdminIndexView(flask_admin.AdminIndexView):
     @expose('/')
     def index(self):
+        from app.tasks import create_user
+        admins = User.query.filter(User.is_admin).all()
+        if len(admins) == 0:
+            create_user(shortname = "ADMIN", nickname = "admin", password = "admin", company = None, is_admin = 1)
         if (not flask_login.current_user.is_authenticated) or (not flask_login.current_user.is_admin):
             return redirect(url_for('index'))
         return super(MyAdminIndexView, self).index()
@@ -66,8 +70,3 @@ else:
     app.logger.addHandler(file_handler)
 
 from app import routes, models
-from app.tasks import create_user
-
-admins = User.query.filter(User.is_admin).all()
-if len(admins) == 0:
-    create_user(shortname = "ADMIN", nickname = "admin", password = "admin", company = None, is_admin = True)
