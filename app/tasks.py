@@ -49,11 +49,17 @@ def recalculate_ratings(after_time=None):
     for u in users:
         # Get the first timestamp on Rating for each User
         # To initialize first Rating at earliest record of the user.
-        timestamps.append(Rating.query \
-            .filter(Rating.user_id == u.id) \
-            .filter(Rating.rating_type == 'elo') \
-            .order_by(Rating.timestamp) \
-            .first().timestamp )
+        print(u)
+        try:
+            timestamps.append(Rating.query \
+                .filter(Rating.user_id == u.id) \
+                .order_by(Rating.timestamp) \
+                .first().timestamp )
+        except AttributeError:
+            time = datetime.now(tz=tz)
+            # if no rating exists
+            init_ratings(u, time)
+            timestamps.append(time)
     Rating.query.filter(Rating.timestamp >= after_time).delete()
     #db.session.query(Rating).delete()
     db.session.commit()

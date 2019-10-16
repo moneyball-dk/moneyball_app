@@ -166,3 +166,8 @@ class SelectPlotResampleForm(FlaskForm):
 class CreateCompanyForm(FlaskForm):
     name = StringField('Company Name', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+class RecalculateRatingsForm(FlaskForm):
+    timestamp = DateTimeField("Recalculate from:", default=copenhagen_now,
+        id='datepick')
+    submit = SubmitField('Submit')

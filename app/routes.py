@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import User, Match, UserMatch, Rating
-from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, EditPasswordForm, ChooseBestMatchupForm, SelectPlotResampleForm, CreateCompanyForm
+from app.forms import LoginForm, RegistrationForm, CreateMatchForm, EditUserForm, ChooseLeaderboardSorting, EditPasswordForm, ChooseBestMatchupForm, SelectPlotResampleForm, CreateCompanyForm, RecalculateRatingsForm
 from app.plots import plot_ratings
 import time
 
@@ -135,6 +135,19 @@ def route_recalculate_ratings():
         tasks.recalculate_ratings()
         flash('Recalculated ratings!')
     return redirect(url_for('index'))
+
+
+@app.route('/recalculate_ratings_from', methods=["GET", "POST"])
+@login_required
+def route_recalculate_ratings_from():
+    form = RecalculateRatingsForm()
+    if form.validate_on_submit():
+        timestamp = form.timestamp.data
+        tasks.recalculate_ratings(after_time=timestamp)
+        flash('Recalculated ratings!')
+        return redirect(url_for('index'))
+
+    return render_template("recalculate_ratings.html", form=form)
 
 @app.route('/delete_match/<match_id>', methods=['POST'])
 @login_required
