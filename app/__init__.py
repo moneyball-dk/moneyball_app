@@ -65,5 +65,9 @@ else:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 
-
 from app import routes, models
+from app.tasks import create_user
+
+admins = User.query.filter(User.is_admin).all()
+if len(admins) == 0:
+    create_user(shortname = "ADMIN", nickname = "admin", password = "admin", company = None, is_admin = True)

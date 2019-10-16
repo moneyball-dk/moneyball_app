@@ -6,7 +6,7 @@ from dateutil.tz import gettz
 import numpy as np
 tz = gettz('Europe/Copenhagen')
 
-def create_user(shortname, nickname, password, company):
+def create_user(shortname, nickname, password, company, is_admin = None):
     sn_user = User.query.filter(User.shortname == shortname.upper()).first()
     nn_user = User.query.filter(User.nickname == nickname).first()
     if sn_user is not None:
@@ -17,7 +17,8 @@ def create_user(shortname, nickname, password, company):
     user = User(
         shortname=shortname.upper(),
         nickname=nickname,
-        company=company
+        company=company,
+        is_admin = is_admin
     )
     user.set_password(password)
     db.session.add(user)
