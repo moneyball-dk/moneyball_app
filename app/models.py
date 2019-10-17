@@ -172,7 +172,7 @@ class UserMatch(db.Model):
     match = db.relationship('Match', foreign_keys=match_id )
 
 def copenhagen_now():
-    return datetime.now(tz=tz)
+    return datetime.now()
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)

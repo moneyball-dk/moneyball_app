@@ -28,7 +28,7 @@ def create_user(shortname, nickname, password, company, is_admin = 0):
 
 def init_ratings(user, timestamp=None):
     if timestamp is None:
-        timestamp = datetime.now(tz=tz)
+        timestamp = datetime.now()
     r_elo = Rating(user=user, rating_type='elo', rating_value=1500,
         timestamp=timestamp)
     r_ts_m = Rating(user=user, rating_type='trueskill_mu',
@@ -54,10 +54,9 @@ def recalculate_ratings(after_time=None):
                 .filter(Rating.user_id == u.id) \
                 .order_by(Rating.timestamp) \
                 .first().timestamp
-            time = time.replace(tzinfo=tz)
             timestamps.append(time)
         except AttributeError:
-            time = datetime.now(tz=tz)
+            time = datetime.now()
             # if no rating exists
             init_ratings(u, time)
             timestamps.append(time)
@@ -182,7 +181,7 @@ def approve_match(match, approver):
 def make_new_match(winners, losers, w_score, l_score, importance,
     user_creating_match=None, timestamp=None):
     if timestamp is None:
-        timestamp = datetime.now(tz=tz)
+        timestamp = datetime.now()
     approved_winner, approved_loser = False, False
     if user_creating_match in winners:
         approved_winner = True
