@@ -71,7 +71,7 @@ def sort_players():
         )
 
 def copenhagen_now():
-    return datetime.now(tz=tz)
+    return datetime.now()
 
 class CreateMatchForm(FlaskForm):
     winners = QuerySelectMultipleField(
