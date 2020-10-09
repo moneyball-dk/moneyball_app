@@ -41,6 +41,10 @@ def init_ratings(user, timestamp=None):
     db.session.commit()
 
 def recalculate_ratings(after_time=None):
+    """
+    Reset all ratings (possibly only `after_time`)
+    Recalculate all ratings and commit new ratings to db. 
+    """
     if after_time is None:
         # Set first datetime to earliest possible time
         after_time = datetime.min
